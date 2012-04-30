@@ -52,8 +52,14 @@ au FileType javascript,html iab it <esc>Iit("<esc>$s", function() {<return>});<e
 " carros each => for(var i = 0; i<carros.length; i++){var carro = carros[i];}
 au FileType javascript,html iab each <esc>v_yIfor(var i = 0; i<<esc>$a<backspace>.length; i++) {<return>var <esc>pi<backspace> = <esc>pi[i];<return>}<esc>kA
 
+"i 0 10 upto => for(var i = 0; i<=10; i++){}
+au FileType javascript,html iab upto <esc>_vt yifor(var <esc>f i =<esc>lf i<delete>;  <esc>hpf i<delete> <= <esc>$i<delete>;  <esc>hpf i<delete>++)<return>{<return>}<esc>kA
+
 " carros each => for(int i = 0; i<carros.length; i++){int carro = carros[i];}
 au FileType c,cpp iab each <esc>v_yOint i;<esc>jIfor(i = 0; i<<esc>$a<backspace>.length; i++)<return>{<return>int <esc>pi<backspace> = <esc>pi[i];<return>}<esc>kA
+
+"i 0 10 upto => int i;for(i = 0; i<=10; i++){}
+au FileType c,cpp iab upto <esc>_vt yiint <esc>f i;<return>for( <esc>hpf i<delete> = <esc>f i<delete>;  <esc>hpf i<delete> <= <esc>$i<delete>;  <esc>hpf i<delete>++)<return>{<return>}<esc>kA
 
 
 " Skeletons
