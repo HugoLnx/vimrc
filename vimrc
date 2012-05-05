@@ -29,6 +29,11 @@ autocmd FileType java    set ts=4
 autocmd FileType java    set sts=4
 autocmd FileType java    set sw=4
 
+" Corridingo os malditos 'ht's
+iab lenght length
+iab widht width
+iab heigth height
+
 " seta o expandtab para esses tipos de arquivo
 au FileType ruby,javascript,python,html,erb set expandtab
 
