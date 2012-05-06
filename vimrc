@@ -58,7 +58,7 @@ au FileType javascript,html iab it <esc>Iit("<esc>$s", function() {<return>});<e
 au FileType javascript,html iab each <esc>v_yIfor(var i = 0; i<<esc>$a<backspace>.length; i++) {<return>var <esc>pi<backspace> = <esc>pi[i];<return>}<esc>kA
 
 "i 0 10 upto => for(var i = 0; i<=10; i++){}
-au FileType javascript,html iab upto <esc>_vt yifor(var <esc>f i =<esc>lf i<delete>;  <esc>hpf i<delete> <= <esc>$i<delete>;  <esc>hpf i<delete>++)<return>{<return>}<esc>kA
+au FileType javascript,html iab upto <esc>_vt yifor(var <esc>f i =<esc>lf i<delete>;  <esc>hpf i<delete> <= <esc>$i<delete>;  <esc>hpf i<delete>++) {<return>}<esc>kA
 
 " hugo gt => this.hugo = function(){return hugo};
 au FileType javascript,html iab gt <esc>v_yIthis.<esc>f i<delete> = function() {<return>return <esc>pi;<return>};
