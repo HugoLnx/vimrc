@@ -29,6 +29,12 @@ autocmd FileType java    set ts=4
 autocmd FileType java    set sts=4
 autocmd FileType java    set sw=4
 
+" Renomeia arquivo atual
+command -nargs=+ -complete=file To let originalfilename = expand('%:q')|f <args>/%:t|w|exec "!rm ".originalfilename
+
+" Deleta arquivo atual
+command -nargs=0 Del let nothing = system("rm ".expand('%:p'))|q
+
 " Corridingo os malditos 'ht's
 iab lenght length
 iab widht width
