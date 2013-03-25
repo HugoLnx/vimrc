@@ -22,6 +22,11 @@ map K 5k
 map W 3w
 map B 3b
 
+" ragtag
+inoremap <M-o> <Esc>o
+inoremap <C-j> <Down>
+let g:ragtag_global_maps = 1
+
 hi CursorLine term=none cterm=none ctermbg=0
 hi RubySymbol term=none cterm=none ctermfg=darkYellow
 
