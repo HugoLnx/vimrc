@@ -1,3 +1,5 @@
+execute pathogen#infect()
+
 syntax on
 filetype plugin on
 filetype indent on
