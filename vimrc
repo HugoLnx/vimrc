@@ -1,9 +1,16 @@
-execute pathogen#infect()
+set nocompatible
+
+set rtp+=~/.vim/bundle/vundle/
+call vundle#rc()
+
+Bundle 'gmarik/vundle'
+Bundle 'kien/ctrlp.vim'
+Bundle 'tpope/vim-ragtag'
+Bundle 'mattn/zencoding-vim'
 
 syntax on
 filetype plugin on
 filetype indent on
-set nocompatible
 set number
 set autoindent
 set smartindent
