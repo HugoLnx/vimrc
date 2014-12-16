@@ -1,12 +1,13 @@
 set nocompatible
 
-set rtp+=~/.vim/bundle/vundle/
-call vundle#rc()
+set rtp+=~/.vim/bundle/Vundle.vim
 
-Bundle 'gmarik/vundle'
-Bundle 'kien/ctrlp.vim'
-Bundle 'tpope/vim-ragtag'
-Bundle 'mattn/zencoding-vim'
+call vundle#begin()
+Plugin 'gmarik/vundle'
+Plugin 'kien/ctrlp.vim'
+Plugin 'tpope/vim-ragtag'
+Plugin 'mattn/zencoding-vim'
+call vundle#end()
 
 syntax on
 filetype plugin on
