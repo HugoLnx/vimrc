@@ -6,7 +6,8 @@ call vundle#begin()
 Plugin 'gmarik/vundle'
 Plugin 'kien/ctrlp.vim'
 Plugin 'tpope/vim-ragtag'
-Plugin 'mattn/zencoding-vim'
+Plugin 'mattn/emmet-vim'
+Plugin 'chase/vim-ansible-yaml'
 call vundle#end()
 
 syntax on
