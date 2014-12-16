@@ -57,10 +57,10 @@ iab widht width
 iab heigth height
 
 " seta o expandtab para esses tipos de arquivo
-au FileType ruby,javascript,python,html,erb set expandtab
+au FileType ruby,javascript,python,html,erb,yaml,yml,playbook set expandtab
 
 " seta todos os tabs para espaço ao abrir ou salvar
-au BufRead,BufWrite *.rb,*.js,*[rR]akefile,*.py retab
+au BufRead,BufWrite *.rb,*.js,*[rR]akefile,*.py,*.yml,*.playbook retab
 
 " name  fun<enter> => function name()
 " name a,b,c fun<enter> => function name(a,b,c)
