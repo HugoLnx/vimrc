@@ -33,6 +33,12 @@ map K 5k
 map W 3w
 map B 3b
 
+" clear last search
+nmap <C-n> :let @/ = ""<enter>
+
+" reload vimrc
+nmap <C-r> :so ~/.vimrc<enter>
+
 " ragtag
 inoremap <M-o> <Esc>o
 inoremap <C-j> <Down>
