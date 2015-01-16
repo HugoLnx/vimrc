@@ -37,7 +37,7 @@ map B 3b
 nmap <C-n> :let @/ = ""<enter>
 
 " reload vimrc
-nmap <C-r> :so ~/.vimrc<enter>
+nmap <C-s> :so ~/.vimrc<enter>
 
 " ragtag
 inoremap <M-o> <Esc>o
