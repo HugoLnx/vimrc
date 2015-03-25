@@ -7,3 +7,4 @@ mkdir -p ~/.vim/syntax
 cp -rf ./vim/skeletons/* ~/.vim/skeletons
 cp -rf ./vim/syntax/* ~/.vim/syntax
 cp ./vimrc ~/.vimrc
+cp ./gitconfig ~/.gitconfig

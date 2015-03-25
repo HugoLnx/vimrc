@@ -70,47 +70,50 @@ au BufRead,BufWrite *.rb,*.js,*[rR]akefile,*.py,*.yml,*.playbook retab
 
 " name  fun<enter> => function name()
 " name a,b,c fun<enter> => function name(a,b,c)
-au FileType javascript,html iab fun <esc>Ifunction <esc>f s(<esc>$i) {<return>}<esc>kA
+au FileType javascript,html iab mfun <esc>Ifunction <esc>f s(<esc>$i) {<return>}<esc>kA
 
 " name  tfun<enter> => this.name = function()
 " name a,b,c tfun<enter> => this.name = function(a,b,c)
-au FileType javascript,html iab tfun <esc>Ithis.<esc>f s = function(<esc>$i) {<return>}<esc>kA
+au FileType javascript,html iab mtfun <esc>Ithis.<esc>f s = function(<esc>$i) {<return>}<esc>kA
 
 " SomeFuncion desc<enter> => describe("SomeFunction", function(){});
-au FileType javascript,html iab desc <esc>Idescribe("<esc>$s", function() {<return>});<esc>kA
+au FileType javascript,html iab mdesc <esc>Idescribe("<esc>$s", function() {<return>});<esc>kA
 
 " should do something it<enter> => describe("should do something", function(){});
-au FileType javascript,html iab it <esc>Iit("<esc>$s", function() {<return>});<esc>kA
+au FileType javascript,html iab mit <esc>Iit("<esc>$s", function() {<return>});<esc>kA
+
+" mbeach => beforeEach(function(){});
+au FileType javascript,html iab mbeach <esc>IbeforeEach(function() {<return>});<esc>kA
 
 " carros each => for(var i = 0; i<carros.length; i++){var carro = carros[i];}
-au FileType javascript,html iab each <esc>v_yIfor(var i = 0; i<<esc>$a<backspace>.length; i++) {<return>var <esc>pi<backspace> = <esc>pi[i];<return>}<esc>kA
+au FileType javascript,html iab meach <esc>v_yIfor(var i = 0; i<<esc>$a<backspace>.length; i++) {<return>var <esc>pi<backspace> = <esc>pi[i];<return>}<esc>kA
 
 "i 0 10 upto => for(var i = 0; i<=10; i++){}
-au FileType javascript,html iab upto <esc>_vt yifor(var <esc>f i =<esc>lf i<delete>;  <esc>hpf i<delete> <= <esc>$i<delete>;  <esc>hpf i<delete>++) {<return>}<esc>kA
+au FileType javascript,html iab mupto <esc>_vt yifor(var <esc>f i =<esc>lf i<delete>;  <esc>hpf i<delete> <= <esc>$i<delete>;  <esc>hpf i<delete>++) {<return>}<esc>kA
 
 " hugo gt => this.hugo = function(){return hugo};
-au FileType javascript,html iab gt <esc>v_yIthis.<esc>f i<delete> = function() {<return>return <esc>pi;<return>};
+au FileType javascript,html iab mgt <esc>v_yIthis.<esc>f i<delete> = function() {<return>return <esc>pi;<return>};
 
 " hugo _gt => this.hugo = function(){return _hugo};
-au FileType javascript,html iab _gt <esc>v_yIthis.<esc>f i<delete> = function() {<return>return _<esc>pi;<return>};
+au FileType javascript,html iab m_gt <esc>v_yIthis.<esc>f i<delete> = function() {<return>return _<esc>pi;<return>};
 
 " hugo st => this.hugo = function(_hugo){hugo = _hugo};
-au FileType javascript,html iab st <esc>v_yIthis.<esc>f i<delete> = function(_<esc>pi) {<return> <backspace><esc>pi = _<esc>pi;<return>};
+au FileType javascript,html iab mst <esc>v_yIthis.<esc>f i<delete> = function(_<esc>pi) {<return> <backspace><esc>pi = _<esc>pi;<return>};
 
 " hugo _st => this.hugo = function(hugo){_hugo = hugo};
-au FileType javascript,html iab _st <esc>v_yIthis.<esc>f i<delete> = function(<esc>pi) {<return>_<esc>pi = <esc>pi;<return>};
+au FileType javascript,html iab m_st <esc>v_yIthis.<esc>f i<delete> = function(<esc>pi) {<return>_<esc>pi = <esc>pi;<return>};
 
 " hugo gst => this.hugo = function(_hugo){if (_hugo){return hugo} else {hugo = _hugo}};
-au FileType javascript,html iab gst <esc>v_yIthis.<esc>f i<delete> = function(_<esc>pi) {<return>if (_<esc>pi === undefined) {<return>return <esc>pi;<return>} else {<return> <backspace><esc>pi =_<esc>pi;<return>}<return>};
+au FileType javascript,html iab mgst <esc>v_yIthis.<esc>f i<delete> = function(_<esc>pi) {<return>if (_<esc>pi === undefined) {<return>return <esc>pi;<return>} else {<return> <backspace><esc>pi =_<esc>pi;<return>}<return>};
 
 " hugo _gst => this.hugo = function(hugo){if (hugo){return _hugo} else {_hugo = hugo}};
-au FileType javascript,html iab _gst <esc>v_yIthis.<esc>f i<delete> = function(<esc>pi) {<return>if (<esc>pi === undefined) {<return>return _<esc>pi;<return>} else {<return>_<esc>pi = <esc>pi;<return>}<return>};
+au FileType javascript,html iab m_gst <esc>v_yIthis.<esc>f i<delete> = function(<esc>pi) {<return>if (<esc>pi === undefined) {<return>return _<esc>pi;<return>} else {<return>_<esc>pi = <esc>pi;<return>}<return>};
 
 " carros each => for(int i = 0; i<carros.length; i++){int carro = carros[i];}
-au FileType c,cpp iab each <esc>v_yOint i;<esc>jIfor(i = 0; i<<esc>$a<backspace>.length; i++)<return>{<return>int <esc>pi<backspace> = <esc>pi[i];<return>}<esc>kA
+au FileType c,cpp iab meach <esc>v_yOint i;<esc>jIfor(i = 0; i<<esc>$a<backspace>.length; i++)<return>{<return>int <esc>pi<backspace> = <esc>pi[i];<return>}<esc>kA
 
 "i 0 10 upto => int i;for(i = 0; i<=10; i++){}
-au FileType c,cpp iab upto <esc>_vt yiint <esc>f i;<return>for( <esc>hpf i<delete> = <esc>f i<delete>;  <esc>hpf i<delete> <= <esc>$i<delete>;  <esc>hpf i<delete>++)<return>{<return>}<esc>kA
+au FileType c,cpp iab mupto <esc>_vt yiint <esc>f i;<return>for( <esc>hpf i<delete> = <esc>f i<delete>;  <esc>hpf i<delete> <= <esc>$i<delete>;  <esc>hpf i<delete>++)<return>{<return>}<esc>kA
 
 " Skeletons
 au BufNewFile  *.html,*.erb  0r ~/.vim/skeletons/html
