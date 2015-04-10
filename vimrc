@@ -3,16 +3,16 @@ set nocompatible
 set rtp+=~/.vim/bundle/Vundle.vim
 
 call vundle#begin()
-Plugin 'gmarik/vundle'
+Plugin 'gmarik/Vundle.vim'
 Plugin 'kien/ctrlp.vim'
 Plugin 'tpope/vim-ragtag'
 Plugin 'mattn/emmet-vim'
 Plugin 'chase/vim-ansible-yaml'
+Plugin 'altercation/vim-colors-solarized'
 call vundle#end()
 
 syntax on
-filetype plugin on
-filetype indent on
+filetype plugin indent on
 set number
 set autoindent
 set smartindent
