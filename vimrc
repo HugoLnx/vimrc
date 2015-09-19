@@ -9,6 +9,7 @@ Plugin 'tpope/vim-ragtag'
 Plugin 'mattn/emmet-vim'
 Plugin 'chase/vim-ansible-yaml'
 Plugin 'altercation/vim-colors-solarized'
+Plugin 'elixir-lang/vim-elixir'
 call vundle#end()
 
 syntax on
