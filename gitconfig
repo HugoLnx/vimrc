@@ -5,7 +5,7 @@
 	default = simple
 
 [alias]
-	lg = log --all --graph --decorate --abbrev-commit --date=relative --pretty=format:"%C(auto)%h%C(red)%x09%<(30,trunc)%an%C(green)%x09%ad%C(white)%x09%s%C(auto)%d"
+	lg = log --graph --decorate --abbrev-commit --date=relative --pretty=format:"%C(auto)%h%C(red)%x09%<(30,trunc)%an%C(green)%x09%ad%C(white)%x09%s%C(auto)%d"
 	st = status
 	df = diff
 	cm = !git add -A && git commit
@@ -13,3 +13,6 @@
 	undo = !git add -u . && git reset --hard
 	pll = !git submodule update --init --recursive && git pull --rebase --prune ${1:-origin} ${2:-master}
   psh = !git push ${1:-origin} ${2:-master}
+
+[core]
+	editor = vim
