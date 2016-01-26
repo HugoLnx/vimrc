@@ -118,7 +118,8 @@ au FileType c,cpp iab mupto <esc>_vt yiint <esc>f i;<return>for( <esc>hpf i<dele
 
 " Skeletons
 au BufNewFile  *.html,*.erb  0r ~/.vim/skeletons/html
-au BufNewFile  *.c,*.cpp  0r ~/.vim/skeletons/c
+au BufNewFile  *.c  0r ~/.vim/skeletons/c
+au BufNewFile  *.cpp  0r ~/.vim/skeletons/cpp
 
 " caracteres em branco no final aparecem em vermelho
 syn match brancomala '\s\+$' | hi brancomala ctermbg=red
