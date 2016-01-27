@@ -10,7 +10,11 @@ Plugin 'mattn/emmet-vim'
 Plugin 'chase/vim-ansible-yaml'
 Plugin 'altercation/vim-colors-solarized'
 Plugin 'elixir-lang/vim-elixir'
+Plugin 'derekwyatt/vim-scala'
 call vundle#end()
+
+"Ctrl+P ignore those files
+set wildignore+=*/node_modules/*,*.so,*.swp,*.zip
 
 syntax on
 filetype plugin indent on
