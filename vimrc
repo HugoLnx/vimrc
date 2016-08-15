@@ -15,6 +15,7 @@ call vundle#end()
 
 "Ctrl+P ignore those files
 set wildignore+=*/node_modules/*,*.so,*.swp,*.zip
+let g:ctrlp_custom_ignore = 'node_modules/.*'
 
 syntax on
 filetype plugin indent on
