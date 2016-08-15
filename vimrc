@@ -11,6 +11,7 @@ Plugin 'chase/vim-ansible-yaml'
 Plugin 'altercation/vim-colors-solarized'
 Plugin 'elixir-lang/vim-elixir'
 Plugin 'derekwyatt/vim-scala'
+Plugin 'fatih/vim-go'
 call vundle#end()
 
 "Ctrl+P ignore those files
@@ -49,6 +50,9 @@ nmap <C-s> :so ~/.vimrc<enter>
 inoremap <M-o> <Esc>o
 inoremap <C-j> <Down>
 let g:ragtag_global_maps = 1
+
+" vim-go (avoid conflict with 'map K 5k')
+let g:go_doc_keywordprg_enabled = 0
 
 hi CursorLine term=none cterm=none ctermbg=0
 hi RubySymbol term=none cterm=none ctermfg=darkYellow
