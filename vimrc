@@ -10,7 +10,7 @@ Plugin 'mattn/emmet-vim'
 Plugin 'chase/vim-ansible-yaml'
 Plugin 'altercation/vim-colors-solarized'
 Plugin 'elixir-lang/vim-elixir'
-Plugin 'derekwyatt/vim-scala'
+Plugin 'ensime/ensime-vim'
 Plugin 'fatih/vim-go'
 call vundle#end()
 
