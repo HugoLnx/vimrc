@@ -10,6 +10,14 @@
 #include <set>
 #include <queue>
 
+##define all(v) (v).begin(), (v).end()
+##define rall(v) (v).rbegin(), (v).rend()
+
+#define FOR(it, b, e) for (typeof(b) it = (b); it <= (e); ++it)
+#define FORX(it, b, e) for (typeof(b) it = (b); it < (e); ++it)
+#define MSET(c, v) memset(c, v, sizeof(c)
+const int INF = 0x3F3F3F3F; const int NEGINF = 0xC0C0C0C0;
+
 using namespace std;
 
 int main()
