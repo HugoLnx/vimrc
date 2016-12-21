@@ -23,8 +23,8 @@ au  BufNewFile,BufReadPost *.smv  so ~/.vim/syntax/smv.vim
 augroup END
 
 "Ctrl+P ignore those files
-set wildignore+=*/node_modules/*,*.so,*.swp,*.zip
-let g:ctrlp_custom_ignore = 'node_modules/.*'
+set wildignore+=*/node_modules/*,*.so,*.swp,*.zip,*/deps/*,*/_build/*
+let g:ctrlp_custom_ignore = 'node_modules/.*,deps/.*,_build/.*'
 
 syntax on
 filetype plugin indent on
