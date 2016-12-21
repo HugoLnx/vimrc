@@ -12,7 +12,15 @@ Plugin 'altercation/vim-colors-solarized'
 Plugin 'elixir-lang/vim-elixir'
 Plugin 'ensime/ensime-vim'
 Plugin 'fatih/vim-go'
+Plugin 'terryma/vim-multiple-cursors'
+Plugin 'scrooloose/syntastic'
 call vundle#end()
+
+"SMV syntax
+augroup syntax
+au! BufNewFile,BufReadPost *.smv
+au  BufNewFile,BufReadPost *.smv  so ~/.vim/syntax/smv.vim
+augroup END
 
 "Ctrl+P ignore those files
 set wildignore+=*/node_modules/*,*.so,*.swp,*.zip
@@ -100,6 +108,9 @@ au FileType javascript,html iab meach <esc>v_yIfor(var i = 0; i<<esc>$a<backspac
 
 "i 0 10 upto => for(var i = 0; i<=10; i++){}
 au FileType javascript,html iab mupto <esc>_vt yifor(var <esc>f i =<esc>lf i<delete>;  <esc>hpf i<delete> <= <esc>$i<delete>;  <esc>hpf i<delete>++) {<return>}<esc>kA
+
+"i 10 times => int i;for(i = 0; i<10; i++){}
+au FileType javascript,html iab mtimes <esc>_vt yiint <esc>f i;<return>for( <esc>hpf i<delete> = 0;  <esc>hpf i<delete> < <esc>$i<delete>;  <esc>hpf i<delete>++)<return>{<return>}<esc>kA
 
 " hugo gt => this.hugo = function(){return hugo};
 au FileType javascript,html iab mgt <esc>v_yIthis.<esc>f i<delete> = function() {<return>return <esc>pi;<return>};
