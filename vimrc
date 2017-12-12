@@ -5,36 +5,24 @@ set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 Plugin 'gmarik/Vundle.vim'
 Plugin 'kien/ctrlp.vim'
-Plugin 'tpope/vim-ragtag'
-Plugin 'mattn/emmet-vim'
-Plugin 'chase/vim-ansible-yaml'
 Plugin 'altercation/vim-colors-solarized'
 Plugin 'elixir-lang/vim-elixir'
-Plugin 'ensime/ensime-vim'
-Plugin 'fatih/vim-go'
 Plugin 'terryma/vim-multiple-cursors'
 Plugin 'scrooloose/syntastic'
 call vundle#end()
 
-"SMV syntax
-augroup syntax
-au! BufNewFile,BufReadPost *.smv
-au  BufNewFile,BufReadPost *.smv  so ~/.vim/syntax/smv.vim
-augroup END
-
 "Ctrl+P ignore those files
-set wildignore+=*/node_modules/*,*.so,*.swp,*.zip,*/deps/*,*/_build/*
-let g:ctrlp_custom_ignore = 'node_modules/.*,deps/.*,_build/.*'
+set wildignore+=*/node_modules/*,*.so,*.swp,*.zip,*/deps/*,*/_build/*,*/_old/*,*/vendor/ruby/*,*/coverage/*
+let g:ctrlp_custom_ignore = 'node_modules/.*,deps/.*,_build/.*,_old/.*,vendor/ruby/.*,coverage/.*'
 
 syntax on
 filetype plugin indent on
 set number
+set nocursorline
 set autoindent
 set smartindent
 set ruler
-set ts=2
-set sts=2
-set sw=2
+set ts=2 sts=2 sw=2 bs=2
 
 set backup
 set backupdir=~/.vim/backup
@@ -51,40 +39,18 @@ map B 3b
 " clear last search
 nmap <C-n> :let @/ = ""<enter>
 
-" reload vimrc
-nmap <C-s> :so ~/.vimrc<enter>
-
-" ragtag
-inoremap <M-o> <Esc>o
-inoremap <C-j> <Down>
-let g:ragtag_global_maps = 1
-
-" vim-go (avoid conflict with 'map K 5k')
-let g:go_doc_keywordprg_enabled = 0
-
-hi CursorLine term=none cterm=none ctermbg=0
 hi RubySymbol term=none cterm=none ctermfg=darkYellow
 
 autocmd FileType java    set ts=4
 autocmd FileType java    set sts=4
 autocmd FileType java    set sw=4
-
-" Renomeia arquivo atual
-command -nargs=+ -complete=file To let originalfilename = expand('%:q')|f <args>/%:t|w|exec "!rm ".originalfilename
-
-" Deleta arquivo atual
-command -nargs=0 Del let nothing = system("rm ".expand('%:p'))|q
-
-" Corridingo os malditos 'ht's
-iab lenght length
-iab widht width
-iab heigth height
+autocmd FileType java    set bs=4
 
 " seta o expandtab para esses tipos de arquivo
-au FileType ruby,javascript,python,html,erb,yaml,yml,playbook set expandtab
+au FileType ruby,javascript,python,html,erb,yaml,yml,playbook,lua set expandtab
 
 " seta todos os tabs para espaço ao abrir ou salvar
-au BufRead,BufWrite *.rb,*.js,*[rR]akefile,*.py,*.yml,*.playbook retab
+au BufRead,BufWrite *.rb,*.js,*[rR]akefile,*.py,*.yml,*.playbook,*.lua retab
 
 " name  fun<enter> => function name()
 " name a,b,c fun<enter> => function name(a,b,c)
@@ -142,7 +108,7 @@ au BufNewFile  *.c  0r ~/.vim/skeletons/c
 au BufNewFile  *.cpp  0r ~/.vim/skeletons/cpp
 
 " caracteres em branco no final aparecem em vermelho
-syn match brancomala '\s\+$' | hi brancomala ctermbg=red
+au BufNewFile,BufRead * syn match brancomala '\s\+$' | hi brancomala ctermbg=red
 
 "  In visual mode when you press * or # to search for the current selection
 vnoremap <silent> * :call VisualSearch('f')<CR>
@@ -167,4 +133,3 @@ function! VisualSearch(direction) range
     let @/ = l:pattern
     let @" = l:saved_reg
 endfunction
-
