@@ -1,5 +1,6 @@
 timestamp=$(date +%Y%m%d%H%M%S)
 if [ -d ~/.vim ];then
+	echo "Backing up ~/.vim on ~/.vim_${timestamp}"
 	cp -rf ~/.vim ~/.vim_${timestamp}
 fi
 
@@ -14,6 +15,7 @@ cp -rf ./vim/syntax/* ~/.vim/syntax
 cp ./vimrc ~/.vimrc
 
 if [ -f ~/.gitconfig ];then
+	echo "Backing up ~/.gitconfig on ~/.gitconfig.bkp_${timestamp}"
     cp ~/.gitconfig ~/.gitconfig.bkp_${timestamp}
 fi
 cp ./gitconfig ~/.gitconfig
