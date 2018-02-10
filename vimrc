@@ -39,6 +39,9 @@ map B 3b
 " clear last search
 nmap <C-n> :let @/ = ""<enter>
 
+" format code of the current file
+nmap X mzgggqG`z
+
 hi RubySymbol term=none cterm=none ctermfg=darkYellow
 
 autocmd FileType java    set ts=4
