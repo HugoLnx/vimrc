@@ -1,5 +1,6 @@
 set nocompatible
 
+filetype off
 set rtp+=~/.vim/bundle/Vundle.vim
 
 call vundle#begin()
@@ -7,13 +8,18 @@ Plugin 'gmarik/Vundle.vim'
 Plugin 'kien/ctrlp.vim'
 Plugin 'altercation/vim-colors-solarized'
 Plugin 'elixir-lang/vim-elixir'
+Plugin 'fatih/vim-go'
 Plugin 'terryma/vim-multiple-cursors'
 Plugin 'scrooloose/syntastic'
+Plugin 'christoomey/vim-tmux-navigator'
+Plugin 'digitaltoad/vim-pug'
+Plugin 'ekalinin/dockerfile.vim'
 call vundle#end()
+filetype on
 
 "Ctrl+P ignore those files
-set wildignore+=*/node_modules/*,*.so,*.swp,*.zip,*/deps/*,*/_build/*,*/_old/*,*/vendor/ruby/*,*/coverage/*
-let g:ctrlp_custom_ignore = 'node_modules/.*,deps/.*,_build/.*,_old/.*,vendor/ruby/.*,coverage/.*'
+set wildignore+=*/node_modules/*,*.so,*.swp,*.zip,*/deps/*,*/_build/*,*/frameworks/*,*/tmp/cache/*,*/dist/*,*/_old/*,*/vendor/ruby/*,*/coverage/*
+let g:ctrlp_custom_ignore = 'node_modules/.*,deps/.*,_build/.*,frameworks/.*,tmp/cache/.*,dist/.*,_old/.*,vendor/ruby/.*,coverage/.*'
 
 syntax on
 filetype plugin indent on
@@ -23,6 +29,7 @@ set autoindent
 set smartindent
 set ruler
 set ts=2 sts=2 sw=2 bs=2
+set backspace=indent,eol,start
 
 set backup
 set backupdir=~/.vim/backup
@@ -31,10 +38,10 @@ set directory=~/.vim/tmp
 nmap H :tabp<enter>
 nmap L :tabn<enter>
 nmap <c-o> o<esc>
-map J 5j
-map K 5k
-map W 3w
-map B 3b
+map J 10j
+map K 10k
+" map W 3w
+" map B 3b
 
 " clear last search
 nmap <C-n> :let @/ = ""<enter>
@@ -49,11 +56,22 @@ autocmd FileType java    set sts=4
 autocmd FileType java    set sw=4
 autocmd FileType java    set bs=4
 
+" Renomeia arquivo atual
+command -nargs=+ -complete=file To let originalfilename = expand('%:q')|f <args>/%:t|w|exec "!rm ".originalfilename
+
+" Deleta arquivo atual
+command -nargs=0 Del let nothing = system("rm ".expand('%:p'))|q
+
+" Corridingo os malditos 'ht's
+iab lenght length
+iab widht width
+iab heigth height
+
 " seta o expandtab para esses tipos de arquivo
-au FileType ruby,javascript,python,html,erb,yaml,yml,playbook,lua set expandtab
+au FileType ruby,javascript,python,html,erb,yaml,yml,playbook,lua,eruby,elixir,pub,hbs,handlebars set expandtab
 
 " seta todos os tabs para espaço ao abrir ou salvar
-au BufRead,BufWrite *.rb,*.js,*[rR]akefile,*.py,*.yml,*.playbook,*.lua retab
+au BufRead,BufWrite *.rb,*.js,*[rR]akefile,*.py,*.yml,*.playbook,*.lua,*.html*,*.erb*,*.ex,*.exs,*.eex,*.pub retab
 
 " name  fun<enter> => function name()
 " name a,b,c fun<enter> => function name(a,b,c)
@@ -81,29 +99,29 @@ au FileType javascript,html iab mupto <esc>_vt yifor(var <esc>f i =<esc>lf i<del
 "i 10 times => int i;for(i = 0; i<10; i++){}
 au FileType javascript,html iab mtimes <esc>_vt yiint <esc>f i;<return>for( <esc>hpf i<delete> = 0;  <esc>hpf i<delete> < <esc>$i<delete>;  <esc>hpf i<delete>++)<return>{<return>}<esc>kA
 
-" hugo gt => this.hugo = function(){return hugo};
-au FileType javascript,html iab mgt <esc>v_yIthis.<esc>f i<delete> = function() {<return>return <esc>pi;<return>};
+" hugo mgt => this.hugo = function(){return _hugo};
+au FileType javascript,html iab mgt <esc>v_yIthis.<esc>f i<delete> = function() {<return>return this._<esc>pi;<return>};
 
-" hugo _gt => this.hugo = function(){return _hugo};
-au FileType javascript,html iab m_gt <esc>v_yIthis.<esc>f i<delete> = function() {<return>return _<esc>pi;<return>};
+" hugo mst => this.hugo = function(hugo){_hugo = hugo};
+au FileType javascript,html iab mst <esc>v_yIthis.<esc>f i<delete> = function(value) {<return>if (value !== undefined) this._<esc>pi = value;<return>};
 
-" hugo st => this.hugo = function(_hugo){hugo = _hugo};
-au FileType javascript,html iab mst <esc>v_yIthis.<esc>f i<delete> = function(_<esc>pi) {<return> <backspace><esc>pi = _<esc>pi;<return>};
-
-" hugo _st => this.hugo = function(hugo){_hugo = hugo};
-au FileType javascript,html iab m_st <esc>v_yIthis.<esc>f i<delete> = function(<esc>pi) {<return>_<esc>pi = <esc>pi;<return>};
-
-" hugo gst => this.hugo = function(_hugo){if (_hugo){return hugo} else {hugo = _hugo}};
-au FileType javascript,html iab mgst <esc>v_yIthis.<esc>f i<delete> = function(_<esc>pi) {<return>if (_<esc>pi === undefined) {<return>return <esc>pi;<return>} else {<return> <backspace><esc>pi =_<esc>pi;<return>}<return>};
-
-" hugo _gst => this.hugo = function(hugo){if (hugo){return _hugo} else {_hugo = hugo}};
-au FileType javascript,html iab m_gst <esc>v_yIthis.<esc>f i<delete> = function(<esc>pi) {<return>if (<esc>pi === undefined) {<return>return _<esc>pi;<return>} else {<return>_<esc>pi = <esc>pi;<return>}<return>};
+" hugo mgst => this.hugo = function(hugo){if (hugo){return _hugo} else {_hugo = hugo}};
+au FileType javascript,html iab mgst <esc>v_yIthis.<esc>f i<delete> = function(value) {<return>if (value !== undefined) this._<esc>pi = value;<return><delete><tab>return this._<esc>pi;<return>};
 
 " carros each => for(int i = 0; i<carros.length; i++){int carro = carros[i];}
 au FileType c,cpp iab meach <esc>v_yOint i;<esc>jIfor(i = 0; i<<esc>$a<backspace>.length; i++)<return>{<return>int <esc>pi<backspace> = <esc>pi[i];<return>}<esc>kA
 
 "i 0 10 upto => int i;for(i = 0; i<=10; i++){}
 au FileType c,cpp iab mupto <esc>_vt yiint <esc>f i;<return>for( <esc>hpf i<delete> = <esc>f i<delete>;  <esc>hpf i<delete> <= <esc>$i<delete>;  <esc>hpf i<delete>++)<return>{<return>}<esc>kA
+
+"def xpto do end
+au FileType elixir iab mdef <esc>x_Cdef <esc>pA do<esc>oend<esc>kA
+
+"defp xpto do end
+au FileType elixir iab mdefp <esc>x_Cdefp <esc>pA do<esc>oend<esc>kA
+
+"defm xpto do end
+au FileType elixir iab mdefm <esc>x_Cdefmodule <esc>pA do<esc>oend<esc>kA
 
 " Skeletons
 au BufNewFile  *.html,*.erb  0r ~/.vim/skeletons/html
