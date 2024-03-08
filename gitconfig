@@ -1,24 +1,52 @@
 [user]
-	name = Hugo Roque
 	email = hugolnx@gmail.com
+	name = hugolnx
+	username = hugolnx
+[init]
+	defaultBranch = main
 [push]
-	default = simple
-
+	default = current
+[pull]
+	default = current
 [alias]
 	lg = log --graph --decorate --abbrev-commit --date=relative --pretty=format:"%C(auto)%h%C(red)%x09%<(30,trunc)%an%C(green)%x09%ad%C(white)%x09%s%C(auto)%d"
 	st = status
 	df = diff
-	cm = !git add -A && git commit
-	cmm = !git add -A && git commit -m
+	cm = commit
+	cmm = commit -m
+	cma = !git add -A && git commit -m
+	ca = commit --amend
+	caa = !git add -A && git commit --amend
+	co = checkout
+	b = branch
+	ba = branch -a
+	bd = branch -D
 	undo = !git add -u . && git reset --hard
-	pll = !git submodule update --init --recursive && git pull --rebase --prune ${1:-origin} ${2:-master}
-  psh = !git push ${1:-origin} ${2:-master}
+	pll = !git submodule update --init --recursive && git pull --rebase --prune ${2:-origin}
+  	psh = !git push ${2:-origin}
+  	rb = rebase
+  	sup = submodule update --init --recursive
+  	mrg = merge --no-ff -m
 
 [core]
 	editor = vim
-  excludesfile = ~/.gitignore
+	excludesfile = ~/.gitignore
+	autocrlf = false
+
+[color]
+	ui = auto
+
+[color "branch"]
+	current = yellow bold
+	local = green bold
+	remote = cyan bold
+
 [filter "lfs"]
 	required = true
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
+
+#[mergetool "unityyamlmerge"]
+#	trustExitCode = false
+#	cmd = 'C:\\Program Files\\Unity\\Hub\\Editor\\2022.3.13f1\\Editor\\Data\\Tools\\UnityYAMLMerge.exe' merge -p "$BASE" "$REMOTE" "$LOCAL" "$MERGED"
