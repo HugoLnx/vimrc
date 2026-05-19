@@ -23,15 +23,17 @@
 	bd = branch -D
 	undo = !git add -u . && git reset --hard
 	pll = !git submodule update --init --recursive && git pull --rebase --prune ${2:-origin}
-  	psh = !git push ${2:-origin}
-  	rb = rebase
-  	sup = submodule update --init --recursive
-  	mrg = merge --no-ff -m
+	psh = !git push ${2:-origin}
+	rb = rebase
+	sup = submodule update --init --recursive
+	mrg = merge --no-ff -m
 
 [core]
 	editor = vim
 	excludesfile = ~/.gitignore
 	autocrlf = false
+	eol = lf
+	symlinks = true
 
 [color]
 	ui = auto
