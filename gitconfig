@@ -26,7 +26,9 @@
 	psh = !git push ${2:-origin}
 	rb = rebase
 	sup = submodule update --init --recursive
-	mrg = merge --no-ff -m
+	# mrg = merge --no-ff -m
+	mrg-to = "!f() { feature=$(git branch --show-current); dest=${1:-main}; msg=${2:-no message}; git checkout \"$dest\" && git merge --no-ff \"$feature\" -m \"Merge local branch '$feature': $msg\"; }; f"
+	mrg-from = "!f() { feature=${1:?Usage: git mrg-from FEATURE-BRANCH [COMMIT-MESSAGE]}; msg=${2:-no message}; git merge --no-ff \"$feature\" -m \"Merge local branch '$feature': $msg\"; }; f"
 
 [core]
 	editor = vim
