@@ -1,0 +1,388 @@
+# =============================================================================
+# .gitignore — aligned with gitattributes (multi-language / multi-platform)
+# =============================================================================
+# Ignores build output, local tooling, secrets, and machine-specific files.
+#
+# Git LFS (see gitattributes): images, audio, video, 3D assets, fonts,
+# documents, archives, and other binaries are tracked via LFS — their
+# extensions are intentionally NOT listed here so LFS rules can apply.
+# Build artifacts are ignored by directory/path instead.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# OS & filesystem
+# -----------------------------------------------------------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+*.stackdump
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# -----------------------------------------------------------------------------
+# Environment, secrets, and local credentials
+# -----------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+*.pem
+*.key
+*.p8
+*.jks
+*.keystore
+secrets/
+credentials/
+*.credentials
+*.secrets
+
+# Signing keys (gitattributes may track committed certs via LFS when needed)
+*.snk
+*.pfx
+*.p12
+
+# -----------------------------------------------------------------------------
+# Logs, temp files, and caches
+# -----------------------------------------------------------------------------
+*.log
+*.logs
+logs/
+*.tmp
+*.temp
+*.swp
+*.swo
+*.swn
+*.bak
+*.orig
+*.rej
+.cache/
+tmp/
+temp/
+*.pid
+*.seed
+*.pid.lock
+
+# -----------------------------------------------------------------------------
+# Editors & AI tooling (local / machine-specific)
+# -----------------------------------------------------------------------------
+# Vim / NeoVim
+*.un~
+Session.vim
+.netrwhist
+tags
+!tags/
+.vim/
+*.viminfo
+
+# VS Code / Visual Studio / Cursor
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/*.code-snippets
+*.code-workspace
+!.vscode/*.code-workspace
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.rsuser
+*.DotSettings.user
+
+# JetBrains
+*.iml
+out/
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# -----------------------------------------------------------------------------
+# Python
+# -----------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+pip-log.txt
+pip-delete-this-directory.txt
+.venv/
+venv/
+ENV/
+env/
+.env/
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.ruff_cache/
+.pytype/
+.dmypy.json
+dmypy.json
+.ipynb_checkpoints/
+.python-version
+
+# -----------------------------------------------------------------------------
+# Node.js / JavaScript / TypeScript
+# -----------------------------------------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-store/
+.npm/
+.yarn/
+.pnp.*
+*.tsbuildinfo
+.eslintcache
+.stylelintcache
+.parcel-cache/
+.turbo/
+.next/
+.nuxt/
+.output/
+.svelte-kit/
+coverage/
+.nyc_output/
+*.local
+
+# -----------------------------------------------------------------------------
+# Ruby / Rails
+# -----------------------------------------------------------------------------
+/.bundle/
+/vendor/bundle
+/vendor/cache
+/.yardoc/
+/_yardoc/
+/doc/
+/rdoc/
+/spec/tmp/
+/spec/reports/
+/log/
+/tmp/
+/storage/
+/public/assets/
+/public/packs/
+/public/packs-test/
+yarn-debug.log*
+.byebug_history
+/.sass-cache/
+/config/master.key
+/config/credentials/*.key
+
+# -----------------------------------------------------------------------------
+# Go
+# -----------------------------------------------------------------------------
+*.test
+/vendor/
+/bin/
+/pkg/
+
+# -----------------------------------------------------------------------------
+# Rust
+# -----------------------------------------------------------------------------
+/target/
+**/*.rs.bk
+
+# -----------------------------------------------------------------------------
+# Lua
+# -----------------------------------------------------------------------------
+luarocks/
+
+# -----------------------------------------------------------------------------
+# C / C++
+# -----------------------------------------------------------------------------
+*.o
+*.obj
+*.lo
+*.la
+*.lai
+*.exp
+*.ilk
+*.idb
+*.ipch
+*.iobj
+*.ipdb
+*.tlog
+*.lastbuildstate
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.VC.opendb
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile.generated
+compile_commands.json
+*.d
+*.gcno
+*.gcda
+*.gcov
+*.profdata
+
+# -----------------------------------------------------------------------------
+# C# / .NET
+# -----------------------------------------------------------------------------
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]uild/
+*.VisualState.xml
+TestResult*/
+[Bb]uild[Ll]og.*
+project.lock.json
+project.fragment.lock.json
+artifacts/
+*.nuget.props
+*.nuget.targets
+packages/
+*.cache
+*.opendb
+*.userprefs
+*.pidb
+*.svclog
+*.scc
+*.ncb
+*.aps
+*.plg
+*.opt
+*.clw
+*.pch
+*.res
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp_proj
+*.vspscc
+*.vssscc
+.builds
+_ReSharper*/
+*.[Rr]e[Ss]harper
+_TeamCity*
+*.DotCover
+*.dotCover
+*.ncrunch*
+.*crunch*.local.xml
+nCrunchTemp_*
+*.mm.*
+AutoTest.Net/
+[Ee]xpress/
+.vs/
+*.csproj.user
+*.vbproj.user
+*.vcxproj.user
+*.sln.docstates
+
+# -----------------------------------------------------------------------------
+# Shaders / game engines (Unity, Unreal, etc.)
+# -----------------------------------------------------------------------------
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+sysinfo.txt
+*.apk
+*.aab
+*.ipa
+*.app
+DerivedDataCache/
+Saved/
+Intermediate/
+Binaries/
+DerivedData/
+
+# -----------------------------------------------------------------------------
+# Docker & containers
+# -----------------------------------------------------------------------------
+.docker/
+docker-compose.override.yml
+docker-compose.override.yaml
+*.dockerignore.local
+
+# -----------------------------------------------------------------------------
+# Test & coverage output
+# -----------------------------------------------------------------------------
+coverage/
+*.lcov
+htmlcov/
+test-results/
+TestResults/
+junit.xml
+report.xml
+*.trx
+
+# -----------------------------------------------------------------------------
+# Misc tooling
+# -----------------------------------------------------------------------------
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+*.tfvars
+!*.tfvars.example
+.pulumi/
+.serverless/
+.vercel/
+.netlify/
+.firebase/
+*.local.json
+.sass-cache/
+.grunt/
+bower_components/
+jspm_packages/
+typings/
+*.generated.*
