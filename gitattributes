@@ -1,0 +1,298 @@
+# Macro for all binary files that should use Git LFS.
+[attr]lfs-file filter=lfs diff=lfs merge=lfs -text
+
+# Macro for files that should be stored via Git LFS but remain diffable as text.
+[attr]lfs-text filter=lfs diff=lfs merge=lfs text eol=lf
+
+# Macros for files that must always use a specific line ending.
+[attr]text-lf   text eol=lf
+[attr]text-crlf text eol=crlf
+
+# ----------------------------------------------------------------------
+# Line Endings & Text Normalization
+# ----------------------------------------------------------------------
+# Handle text files automatically across Windows, macOS, and Linux
+* text=auto
+
+# Explicitly ensure common windows files preserve correct line endings
+*.bat           text-crlf
+*.cmd           text-crlf
+*.ps1           text-crlf
+*.psm1          text-crlf
+*.psd1          text-crlf
+*.ps1xml        text-crlf
+*.reg           text-crlf
+*.vbs           text-crlf
+*.rc            text-crlf
+*.sln           text-crlf
+
+# Might need to change to crlf on windows
+*.csproj           text-lf
+*.vbproj           text-lf
+*.fsproj           text-lf
+*.resx             text-lf
+*.xaml             text-lf
+*.razor            text-lf
+*.cshtml           text-lf
+*.vbhtml           text-lf
+*.config           text-lf
+*.props            text-lf
+*.targets          text-lf
+*.ruleset          text-lf
+*.vcxproj          text-lf
+*.vcxproj.filters  text-lf
+*.vcxproj.user     text-lf
+*.vcproj           text-lf
+
+# Explicitly ensure common code files use LF line endings
+*.sh            text-lf
+*.py            text-lf
+*.js            text-lf
+*.jsx           text-lf
+*.ts            text-lf
+*.tsx           text-lf
+*.json          text-lf
+*.yaml          text-lf
+*.yml           text-lf
+*.toml          text-lf
+*.ini           text-lf
+*.cfg           text-lf
+*.css           text-lf
+*.scss          text-lf
+*.html          text-lf
+*.xml           text-lf
+*.sql           text-lf
+*.gitignore     text-lf
+*.gitattributes text-lf
+
+# Explicitly ensure common documentation files use LF line endings
+*.md            text-lf
+*.txt           text-lf
+*.csv           text-lf
+*.rst           text-lf
+
+# Ruby / Rails
+*.rb            text-lf
+*.rake          text-lf
+*.gemspec       text-lf
+*.erb           text-lf
+*.haml          text-lf
+*.slim          text-lf
+*.rbs           text-lf
+*.ru            text-lf
+
+# Go
+*.go            text-lf
+
+# Rust
+*.rs            text-lf
+
+# Lua
+*.lua           text-lf
+
+# C / C++
+*.c             text-lf
+*.h             text-lf
+*.cpp           text-lf
+*.cc            text-lf
+*.cxx           text-lf
+*.hpp           text-lf
+*.hh            text-lf
+*.hxx           text-lf
+*.inl           text-lf
+*.ipp           text-lf
+*.tpp           text-lf
+
+# C# / .NET
+*.cs            text-lf
+*.csx           text-lf
+*.vb            text-lf
+*.fs            text-lf
+*.fsx           text-lf
+*.fsi           text-lf
+*.nuspec        text-lf
+
+# Shaders (HLSL / GLSL)
+*.hlsl          text-lf
+*.hlsli         text-lf
+*.glsl          text-lf
+*.glsli         text-lf
+*.vert          text-lf
+*.frag          text-lf
+*.geom          text-lf
+*.comp          text-lf
+*.tesc          text-lf
+*.tese          text-lf
+*.shader        text-lf
+*.cginc         text-lf
+*.fx            text-lf
+*.fxh           text-lf
+*.usf           text-lf
+*.ush           text-lf
+*.compute       text-lf
+*.glslf         text-lf
+*.glslv         text-lf
+
+# Editor & AI tooling configs (Vim, NeoVim, VS Code, Visual Studio, Cursor, ...)
+*.vim            text-lf
+*.vimrc          text-lf
+*.code-workspace text-lf
+*.code-snippets  text-lf
+*.mdc            text-lf
+
+# Build files & other extensionless files
+Makefile         text-lf
+makefile         text-lf
+GNUmakefile      text-lf
+Rakefile         text-lf
+Gemfile          text-lf
+Gemfile.lock     text-lf
+Dockerfile       text-lf
+Dockerfile.*     text-lf
+Procfile         text-lf
+Vagrantfile      text-lf
+Brewfile         text-lf
+Guardfile        text-lf
+Capfile          text-lf
+Berksfile        text-lf
+Podfile          text-lf
+Fastfile         text-lf
+Appfile          text-lf
+Cargo.lock       text-lf
+go.mod           text-lf
+go.sum           text-lf
+.editorconfig    text-lf
+.clang-format    text-lf
+.clang-tidy      text-lf
+.gitmodules      text-lf
+.gitconfig       text-lf
+.cursorrules     text-lf
+
+# ----------------------------------------------------------------------
+# Git LFS (Large File Storage) Configurations
+# ----------------------------------------------------------------------
+# Image
+*.jpg               lfs-file
+*.jpeg              lfs-file
+*.png               lfs-file
+*.gif               lfs-file
+*.psd               lfs-file
+*.ai                lfs-file
+*.apng              lfs-file
+*.atsc              lfs-file
+*.bmp               lfs-file
+*.exr               lfs-file
+*.tiff              lfs-file
+*.tif               lfs-file
+*.iff               lfs-file
+*.pict              lfs-file
+*.dds               lfs-file
+*.xcf               lfs-file
+*.leo               lfs-file
+*.kra               lfs-file
+*.kpp               lfs-file
+*.clip              lfs-file
+*.webm              lfs-file
+*.webp              lfs-file
+*.svg               lfs-text
+*.svgz              lfs-file
+*.afphoto           lfs-file
+*.afdesign          lfs-file
+*.tga               lfs-file
+*.ico               lfs-file
+
+# Audio
+*.mp3               lfs-file
+*.wav               lfs-file
+*.ogg               lfs-file
+*.aiff              lfs-file
+*.aif               lfs-file
+*.mod               lfs-file
+*.it                lfs-file
+*.s3m               lfs-file
+*.xm                lfs-file
+
+# Video
+*.mp4               lfs-file
+*.mov               lfs-file
+*.avi               lfs-file
+*.asf               lfs-file
+*.mpg               lfs-file
+*.mpeg              lfs-file
+*.flv               lfs-file
+*.ogv               lfs-file
+*.wmv               lfs-file
+*.mkv               lfs-file
+
+# 3D Object
+*.obj               lfs-file
+*.[Ff][Bb][Xx]      lfs-file
+*.blend             lfs-file
+*.blender           lfs-file
+*.dae               lfs-file
+*.max               lfs-file
+*.mb                lfs-file
+*.ma                lfs-file
+*.3ds               lfs-file
+*.dfx               lfs-file
+*.c4d               lfs-file
+*.lwo               lfs-file
+*.lwo2              lfs-file
+*.abc               lfs-file
+*.3dm               lfs-file
+*.bin               lfs-file
+*.glb               lfs-file
+
+# Executables
+*.exe               lfs-file
+*.dll               lfs-file
+*.so                lfs-file
+*.pdb               lfs-file
+*.mdb               lfs-file
+*.dylib             lfs-file
+*.lib               lfs-file
+*.o                 lfs-file
+*.suo               lfs-file
+
+# Packaging
+*.zip               lfs-file
+*.7z                lfs-file
+*.gz                lfs-file
+*.tar.gz            lfs-file
+*.rar               lfs-file
+*.tar               lfs-file
+*.dmg               lfs-file
+
+# Documents
+*.pdf               lfs-file
+
+
+# Font formats
+*.ttf               lfs-file
+*.otf               lfs-file
+*.eot               lfs-file
+*.woff              lfs-file
+*.woff2             lfs-file
+
+# Databases
+*.sqlite            lfs-file
+*.db                lfs-file
+
+# .NET Signing & Packaging
+*.snk               lfs-file
+*.pfx               lfs-file
+*.p12               lfs-file
+*.cer               lfs-file
+*.nupkg             lfs-file
+
+# Unity Binaries
+*.unitypackage      lfs-file
+*.sbsar             lfs-file
+*.cubemap           lfs-file
+*.bundle            lfs-file
+
+# etc...
+*.a                 lfs-file
+*.rns               lfs-file
+*.reason            lfs-file
+*.lxo               lfs-file
