@@ -6,13 +6,16 @@ for Neovim, working on Windows, Linux, and macOS.
 ## Layout
 
 ```
-vim/vimrc          shared config, sourced by BOTH `vim` and `nvim`
-vim/plugins.vim     classic-Vim-only plugin list (vim-plug); never loaded by Neovim
-vim/syntax/html/*   HTML5/ARIA/RDFa syntax files for classic Vim (Neovim gets this via treesitter)
-nvim/init.lua       Neovim entrypoint: sources vim/vimrc, then bootstraps lazy.nvim + Lua plugins
-nvim/lua/user/      Neovim-only Lua config (options, keymaps, plugins, LSP, Unity)
-install/install.sh  installer for Linux/macOS
-install/install.ps1 installer for Windows (PowerShell)
+vim/vimrc            shared config, sourced by BOTH `vim` and `nvim`
+vim/plugins.vim       classic-Vim-only plugin list (vim-plug); never loaded by Neovim
+vim/syntax/html/*     HTML5/ARIA/RDFa syntax files for classic Vim (Neovim gets this via treesitter)
+nvim/init.lua         Neovim entrypoint: sources vim/vimrc, then bootstraps lazy.nvim + Lua plugins
+nvim/lua/user/        Neovim-only Lua config (options, keymaps, plugins, LSP, Unity)
+_config.sample.yml    versioned template for config.yml
+config.yml            your home-directory paths (gitignored, not versioned)
+install/symlink.py    reads config.yml, symlinks this repo's config into each listed home
+install/install.sh    installer for Linux/macOS
+install/install.ps1   installer for Windows (PowerShell)
 ```
 
 `vim/vimrc` never references Lua or a plugin manager, so it's safe to source
@@ -40,6 +43,40 @@ it commonly picks up machine-local edits.
 On Windows, creating symlinks requires Developer Mode or an elevated
 PowerShell session; if that's not available the installer falls back to
 copying the files (and you'll need to re-run it after future `git pull`s).
+
+### config.yml
+
+The actual linking work is config-driven: `install.sh`/`install.ps1` create
+`config.yml` from `_config.sample.yml` on first run (one entry for your
+native home) and then call `install/symlink.py`, which reads `config.yml`'s
+`homes` list and creates every link. `config.yml` only says *where* each
+home directory is — `symlink.py` decides which files/subfolders get linked
+under it, based on each entry's `os`.
+
+```yaml
+homes:
+  - os: linux
+    path: "~"
+```
+
+If you're on WSL, you can list both your Linux home and your Windows home
+(reachable at `/mnt/c/Users/<you>`) and one run keeps both in sync:
+
+```yaml
+homes:
+  - os: linux
+    path: /home/hugolnx
+  - os: windows
+    path: /mnt/c/Users/hugolnx
+```
+
+`config.yml` is gitignored (it's machine-specific); re-run
+`python3 install/symlink.py` any time after editing it or pulling changes.
+Useful flags: `--dry-run` (preview only) and `--only linux` / `--only
+windows` / `--only mac` (limit to matching `os` entries). Note that
+symlinking into a `/mnt/c/...` path from WSL depends on Windows/WSL's
+symlink support being enabled — if it's not, `symlink.py` falls back to
+copying, same as the native-Windows fallback.
 
 | | Linux / macOS | Windows |
 |---|---|---|

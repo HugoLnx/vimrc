@@ -1,0 +1,23 @@
+# Copy this file to config.yml (install.sh/install.ps1 do this for you
+# automatically if config.yml doesn't exist yet) and edit it to list the
+# home directories you want this repo's vim/nvim config symlinked into.
+#
+# One entry per home directory. `os` is one of: linux, windows, mac.
+# The symlink script (install/symlink.py) decides the exact files/
+# subfolders to link under each home based on its `os` value - this file
+# only says *where* those homes are.
+#
+# If you're on WSL, you can list both your Linux home and your Windows
+# home (reachable at /mnt/c/Users/<you>) here, and one run of the symlink
+# script keeps both in sync.
+homes:
+  - os: linux
+    path: "~"
+
+# Example WSL setup with both a Linux and a Windows home:
+#
+# homes:
+#   - os: linux
+#     path: /home/hugolnx
+#   - os: windows
+#     path: /mnt/c/Users/hugolnx
