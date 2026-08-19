@@ -120,9 +120,10 @@ top of `.gitignore`).
 ## Plugins
 
 **Neovim** (lazy.nvim): nvim-treesitter, nvim-lspconfig + mason.nvim (LSP,
-including `csharp_ls` for Unity), blink.cmp (completion), telescope.nvim
-(fuzzy finder), lualine.nvim, gitsigns.nvim, kanagawa.nvim, plus
-vim-tmux-navigator and vim-visual-multi (also usable under Neovim).
+including `csharp_ls` for Unity), blink.cmp (completion), supermaven-nvim (AI
+inline completions, Neovim-only), telescope.nvim (fuzzy finder), lualine.nvim,
+gitsigns.nvim, kanagawa.nvim, plus vim-tmux-navigator and vim-visual-multi
+(also usable under Neovim).
 
 **Classic Vim** (vim-plug): ctrlp.vim, kanagawa.vim,
 vim-visual-multi, ALE, vim-tmux-navigator.

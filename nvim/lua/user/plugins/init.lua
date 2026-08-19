@@ -4,6 +4,7 @@ return {
   require('user.plugins.treesitter'),
   require('user.plugins.lsp'),
   require('user.plugins.completion'),
+  require('user.plugins.supermaven'),
   require('user.plugins.telescope'),
   require('user.plugins.colorscheme'),
   require('user.plugins.statusline'),
