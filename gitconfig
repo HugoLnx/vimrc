@@ -51,6 +51,6 @@
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 
-#[mergetool "unityyamlmerge"]
-#	trustExitCode = false
-#	cmd = 'C:\\Program Files\\Unity\\Hub\\Editor\\2022.3.13f1\\Editor\\Data\\Tools\\UnityYAMLMerge.exe' merge -p "$BASE" "$REMOTE" "$LOCAL" "$MERGED"
+# The [mergetool "unityyamlmerge"] block is added automatically below this
+# line if a home entry in config.yml sets `unity_yaml_merge:` to the path
+# of UnityYAMLMerge.exe. See _config.sample.yml.

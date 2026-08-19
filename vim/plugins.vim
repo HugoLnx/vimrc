@@ -15,13 +15,14 @@ Plug 'christoomey/vim-tmux-navigator'
 
 call plug#end()
 
-" Ctrl+P ignore those files
-set wildignore+=*/node_modules/*,*.so,*.swp,*.pyc,*.jpg,*.png,*.jpeg,*.gif,*.zip,*/deps/*,*/_build/*,*/frameworks/*,*/tmp/cache/*,*/dist/*,*/_old/*,*/vendor/ruby/*,*/coverage/*
-let g:ctrlp_custom_ignore = 'node_modules/.*,deps/.*,_build/.*,frameworks/.*,tmp/cache/.*,dist/.*,_old/.*,vendor/ruby/.*,coverage/.*'
+" Ctrl+P: also show hidden (dotfile) files, but always exclude .git/
+let g:ctrlp_show_hidden = 1
+set wildignore+=*/node_modules/*,*.so,*.swp,*.pyc,*.jpg,*.png,*.jpeg,*.gif,*.zip,*/deps/*,*/_build/*,*/frameworks/*,*/tmp/cache/*,*/dist/*,*/_old/*,*/vendor/ruby/*,*/coverage/*,*/.git/*
+let g:ctrlp_custom_ignore = 'node_modules/.*,deps/.*,_build/.*,frameworks/.*,tmp/cache/.*,dist/.*,_old/.*,vendor/ruby/.*,coverage/.*,.git/.*'
 " sudo apt-get install ripgrep
 if executable('rg')
   set grepprg=rg\ --color=never
-  let g:ctrlp_user_command = 'rg %s -i --files --no-heading --color=never --glob ""'
+  let g:ctrlp_user_command = 'rg %s -i --files --no-heading --hidden --color=never --glob "!.git/"'
   let g:ctrlp_use_caching = 0
 else
   let g:ctrlp_clear_cache_on_exit = 0

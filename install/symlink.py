@@ -27,7 +27,6 @@ def layout_for(os_name, home):
                 ('vim/vimrc', home / '.vimrc', False),
                 ('vim/syntax/html', home / '.vim' / 'syntax' / 'html', False),
                 ('nvim', home / '.config' / 'nvim', False),
-                ('gitconfig', home / '.gitconfig', True),
             ],
         }
     if os_name == 'windows':
@@ -37,7 +36,6 @@ def layout_for(os_name, home):
                 ('vim/vimrc', home / '_vimrc', False),
                 ('vim/syntax/html', home / 'vimfiles' / 'syntax' / 'html', False),
                 ('nvim', home / 'AppData' / 'Local' / 'nvim', False),
-                ('gitconfig', home / '.gitconfig', True),
             ],
         }
     raise ValueError(f"Unknown os '{os_name}' (expected linux, mac, or windows)")
@@ -128,6 +126,34 @@ def link_or_copy(source, target, copy, dry_run):
         copy_path(source, target)
 
 
+def gitconfig_content(unity_yaml_merge):
+    content = (REPO_ROOT / 'gitconfig').read_text()
+    if unity_yaml_merge:
+        content += (
+            '\n[mergetool "unityyamlmerge"]\n'
+            '\ttrustExitCode = false\n'
+            f'\tcmd = \'{unity_yaml_merge}\' merge -p "$BASE" "$REMOTE" "$LOCAL" "$MERGED"\n'
+        )
+    return content
+
+
+def sync_gitconfig(target, unity_yaml_merge, dry_run):
+    content = gitconfig_content(unity_yaml_merge)
+    if target.is_file() and target.read_text() == content:
+        print(f"  up to date: {target}")
+        return
+
+    action = f"write {target}"
+    if dry_run:
+        print(f"  [dry-run] {action}")
+        return
+
+    print(f"  {action}")
+    backup_if_exists(target)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(content)
+
+
 def sync_home(entry, dry_run):
     os_name = entry.get('os')
     raw_path = entry.get('path')
@@ -149,6 +175,8 @@ def sync_home(entry, dry_run):
     for source_rel, target, copy in layout['links']:
         source = REPO_ROOT / source_rel
         link_or_copy(source, target, copy, dry_run)
+
+    sync_gitconfig(home / '.gitconfig', entry.get('unity_yaml_merge'), dry_run)
 
 
 def main():

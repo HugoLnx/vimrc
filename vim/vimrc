@@ -23,6 +23,12 @@ else
   set directory=~/.vim/tmp
 endif
 
+" disable error bells (especially annoying under WSL on Windows)
+set noerrorbells
+set novisualbell
+set vb t_vb=
+set belloff=all
+
 nmap H :tabp<enter>
 nmap L :tabn<enter>
 nmap <c-o> o<esc>

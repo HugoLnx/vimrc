@@ -10,14 +10,25 @@
 # If you're on WSL, you can list both your Linux home and your Windows
 # home (reachable at /mnt/c/Users/<you>) here, and one run of the symlink
 # script keeps both in sync.
+#
+# Optional per-home field: `unity_yaml_merge` - the full path to
+# UnityYAMLMerge (bundled with each Unity Editor install, under
+# Editor/Data/Tools/). If set, the symlink script appends a
+# [mergetool "unityyamlmerge"] block to that home's .gitconfig, so `git
+# mergetool` can resolve Unity scene/prefab YAML conflicts. Left unset,
+# no mergetool block is added. The path is version-specific (it lives
+# under the installed Unity Editor version's folder), so update it after
+# switching Unity Editor versions.
 homes:
   - os: linux
     path: "~"
 
-# Example WSL setup with both a Linux and a Windows home:
+# Example WSL setup with both a Linux and a Windows home, and Unity
+# installed on the Windows side:
 #
 # homes:
 #   - os: linux
 #     path: /home/hugolnx
 #   - os: windows
 #     path: /mnt/c/Users/hugolnx
+#     unity_yaml_merge: 'C:\Program Files\Unity\Hub\Editor\6000.0.17f1\Editor\Data\Tools\UnityYAMLMerge.exe'

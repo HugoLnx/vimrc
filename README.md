@@ -60,7 +60,13 @@ homes:
 ```
 
 If you're on WSL, you can list both your Linux home and your Windows home
-(reachable at `/mnt/c/Users/<you>`) and one run keeps both in sync:
+(reachable at `/mnt/c/Users/<you>`) and one run keeps both in sync. A home
+entry can also set `unity_yaml_merge` to the path of `UnityYAMLMerge.exe`
+(bundled with each Unity Editor install), which adds a
+`[mergetool "unityyamlmerge"]` block to that home's `.gitconfig` so `git
+mergetool` can resolve Unity scene/prefab conflicts. It's per-home and
+optional because the path is version-specific and only makes sense where
+Unity is actually installed:
 
 ```yaml
 homes:
@@ -68,6 +74,7 @@ homes:
     path: /home/hugolnx
   - os: windows
     path: /mnt/c/Users/hugolnx
+    unity_yaml_merge: 'C:\Program Files\Unity\Hub\Editor\6000.0.17f1\Editor\Data\Tools\UnityYAMLMerge.exe'
 ```
 
 `config.yml` is gitignored (it's machine-specific); re-run
