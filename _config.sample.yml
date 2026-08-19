@@ -19,6 +19,11 @@
 # no mergetool block is added. The path is version-specific (it lives
 # under the installed Unity Editor version's folder), so update it after
 # switching Unity Editor versions.
+#
+# Optional top-level field: `csharp_lsp` - set to `false` to disable the
+# csharp_ls LSP integration (Unity/.sln-aware, see nvim/lua/user/unity.lua)
+# in Neovim. Defaults to `true`. Applied by writing
+# nvim/lua/user/local.lua (gitignored, regenerated on every run).
 homes:
   - os: linux
     path: "~"

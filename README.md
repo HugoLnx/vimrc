@@ -78,6 +78,13 @@ homes:
     unity_yaml_merge: 'C:\Program Files\Unity\Hub\Editor\6000.0.17f1\Editor\Data\Tools\UnityYAMLMerge.exe'
 ```
 
+`config.yml` also accepts a top-level `csharp_lsp: false` to disable the
+csharp_ls LSP integration (Unity/.sln-aware, see `nvim/lua/user/unity.lua`)
+entirely — useful if you don't do C#/Unity work on a given machine. It
+defaults to `true` and is applied by generating the gitignored
+`nvim/lua/user/local.lua`, which `nvim/lua/user/plugins/lsp.lua` reads at
+startup.
+
 `config.yml` is gitignored (it's machine-specific); re-run
 `python3 install/symlink.py` any time after editing it or pulling changes.
 Useful flags: `--dry-run` (preview only) and `--only linux` / `--only
@@ -114,10 +121,10 @@ top of `.gitignore`).
 
 **Neovim** (lazy.nvim): nvim-treesitter, nvim-lspconfig + mason.nvim (LSP,
 including `csharp_ls` for Unity), blink.cmp (completion), telescope.nvim
-(fuzzy finder), lualine.nvim, gitsigns.nvim, gruvbox.nvim, plus
+(fuzzy finder), lualine.nvim, gitsigns.nvim, kanagawa.nvim, plus
 vim-tmux-navigator and vim-visual-multi (also usable under Neovim).
 
-**Classic Vim** (vim-plug): ctrlp.vim, vim-colors-solarized,
+**Classic Vim** (vim-plug): ctrlp.vim, kanagawa.vim,
 vim-visual-multi, ALE, vim-tmux-navigator.
 
 Replaced from the old config: Vundle → vim-plug/lazy.nvim (unmaintained),

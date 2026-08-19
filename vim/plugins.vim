@@ -8,7 +8,7 @@ else
 endif
 
 Plug 'ctrlpvim/ctrlp.vim'
-Plug 'lifepillar/vim-solarized8'
+Plug 'menisadi/kanagawa.vim'
 Plug 'mg979/vim-visual-multi'
 Plug 'dense-analysis/ale'
 Plug 'christoomey/vim-tmux-navigator'
@@ -28,4 +28,4 @@ else
   let g:ctrlp_clear_cache_on_exit = 0
 endif
 
-colorscheme solarized8
+colorscheme kanagawa

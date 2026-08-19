@@ -28,13 +28,28 @@ return {
       -- Applies to every server mason-lspconfig auto-enables below.
       vim.lsp.config('*', { capabilities = capabilities })
 
+      -- See config.yml's `csharp_lsp` option / install/symlink.py. csharp_ls
+      -- also needs the dotnet SDK on PATH to install/run; skip it on
+      -- machines that don't have that (e.g. a WSL Linux side used only for
+      -- non-Unity work), even if the option itself is left enabled.
+      local ok, local_config = pcall(require, 'user.local')
+      local csharp_lsp_enabled = not (ok and local_config.csharp_lsp == false)
+        and vim.fn.executable('dotnet') == 1
+
+      local ensure_installed = { 'lua_ls', 'gopls' }
+      if csharp_lsp_enabled then
+        table.insert(ensure_installed, 'csharp_ls')
+      end
+
       require('mason-lspconfig').setup({
-        ensure_installed = { 'lua_ls', 'csharp_ls', 'gopls' },
+        ensure_installed = ensure_installed,
         -- csharp_ls is configured separately in user.unity (Unity/.sln aware)
         automatic_enable = { exclude = { 'csharp_ls' } },
       })
 
-      require('user.unity').setup(capabilities)
+      if csharp_lsp_enabled then
+        require('user.unity').setup(capabilities)
+      end
     end,
   },
 }
