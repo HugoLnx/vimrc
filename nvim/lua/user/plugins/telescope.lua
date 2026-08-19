@@ -8,7 +8,14 @@ return {
   },
   config = function()
     local telescope = require('telescope')
-    telescope.setup({})
+    telescope.setup({
+      defaults = {
+        file_ignore_patterns = {
+          'node_modules/', '%.git/', 'deps/', '_build/', 'frameworks/',
+          'tmp/cache/', 'dist/', '_old/', 'vendor/ruby/', 'coverage/',
+        },
+      },
+    })
     pcall(telescope.load_extension, 'fzf')
 
     local builtin = require('telescope.builtin')

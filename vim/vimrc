@@ -6,6 +6,10 @@
 
 syntax on
 filetype plugin indent on
+set background=dark
+if has('termguicolors')
+  set termguicolors
+endif
 set number
 set nocursorline
 set autoindent

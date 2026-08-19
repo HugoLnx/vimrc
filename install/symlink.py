@@ -42,6 +42,7 @@ def layout_for(os_name, home):
             'ensure_dirs': [home / 'vimfiles' / 'backup', home / 'vimfiles' / 'tmp'],
             'links': [
                 ('vim/vimrc', home / '_vimrc', True),
+                ('vim/vimrc', home / 'AppData' / 'Local' / 'vim' / 'vimrc', True),
                 ('vim/syntax/html', home / 'vimfiles' / 'syntax' / 'html', True),
                 ('nvim', home / 'AppData' / 'Local' / 'nvim', True),
                 ('repo-configs', home / 'repo-configs', True),
