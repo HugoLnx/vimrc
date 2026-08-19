@@ -31,13 +31,20 @@ def layout_for(os_name, home):
             ],
         }
     if os_name == 'windows':
+        # copy, not symlink: when this script runs under WSL (the repo lives
+        # on the Linux filesystem, e.g. /home/user/...), a WSL-created
+        # directory symlink into a Windows home becomes an NTFS Junction,
+        # which cannot target a \\wsl.localhost UNC path - native Windows
+        # apps (nvim.exe) then can't follow it, even though it resolves fine
+        # from the WSL side. Copying sidesteps that entirely. Re-run this
+        # script after pulling repo changes to refresh the copies.
         return {
             'ensure_dirs': [home / 'vimfiles' / 'backup', home / 'vimfiles' / 'tmp'],
             'links': [
-                ('vim/vimrc', home / '_vimrc', False),
-                ('vim/syntax/html', home / 'vimfiles' / 'syntax' / 'html', False),
-                ('nvim', home / 'AppData' / 'Local' / 'nvim', False),
-                ('repo-configs', home / 'repo-configs', False),
+                ('vim/vimrc', home / '_vimrc', True),
+                ('vim/syntax/html', home / 'vimfiles' / 'syntax' / 'html', True),
+                ('nvim', home / 'AppData' / 'Local' / 'nvim', True),
+                ('repo-configs', home / 'repo-configs', True),
             ],
         }
     raise ValueError(f"Unknown os '{os_name}' (expected linux, mac, or windows)")
@@ -84,7 +91,19 @@ def copy_path(source, target):
         shutil.copy2(source, target)
 
 
+def dirs_equal(source, target):
+    cmp = filecmp.dircmp(source, target)
+    if cmp.left_only or cmp.right_only or cmp.diff_files or cmp.funny_files:
+        return False
+    _, mismatch, errors = filecmp.cmpfiles(source, target, cmp.common_files, shallow=False)
+    if mismatch or errors:
+        return False
+    return all(dirs_equal(source / d, target / d) for d in cmp.common_dirs)
+
+
 def already_copied(source, target):
+    if source.is_dir() and target.is_dir():
+        return dirs_equal(source, target)
     if not target.is_file() or not source.is_file():
         return False
     return filecmp.cmp(source, target, shallow=False)
@@ -131,10 +150,14 @@ def link_or_copy(source, target, copy, dry_run):
 def gitconfig_content(unity_yaml_merge):
     content = (REPO_ROOT / 'gitconfig').read_text()
     if unity_yaml_merge:
+        # gitconfig value syntax treats backslash as an escape character, so
+        # a raw Windows path (single backslashes) must have them doubled or
+        # git rejects the file with "bad config line".
+        escaped_path = unity_yaml_merge.replace('\\', '\\\\')
         content += (
             '\n[mergetool "unityyamlmerge"]\n'
             '\ttrustExitCode = false\n'
-            f'\tcmd = \'{unity_yaml_merge}\' merge -p "$BASE" "$REMOTE" "$LOCAL" "$MERGED"\n'
+            f'\tcmd = \'{escaped_path}\' merge -p "$BASE" "$REMOTE" "$LOCAL" "$MERGED"\n'
         )
     return content
 

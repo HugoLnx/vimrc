@@ -15,10 +15,9 @@
 
 local M = {}
 
-function M.setup(lspconfig, capabilities)
-  lspconfig.csharp_ls.setup({
-    capabilities = capabilities,
-  })
+function M.setup(capabilities)
+  vim.lsp.config('csharp_ls', { capabilities = capabilities })
+  vim.lsp.enable('csharp_ls')
 end
 
 return M

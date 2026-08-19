@@ -1,2 +1,6 @@
 # Machine-specific home paths (see _config.sample.yml for the template)
 config.yml
+
+# Python (install/symlink.py)
+__pycache__/
+*.py[cod]

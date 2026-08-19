@@ -10,9 +10,6 @@ return {
     },
     config = function()
       require('mason').setup()
-      require('mason-lspconfig').setup({
-        ensure_installed = { 'lua_ls', 'csharp_ls', 'gopls' },
-      })
 
       vim.api.nvim_create_autocmd('LspAttach', {
         callback = function(args)
@@ -26,19 +23,18 @@ return {
         end,
       })
 
-      local lspconfig = require('lspconfig')
       local capabilities = require('blink.cmp').get_lsp_capabilities()
 
-      require('mason-lspconfig').setup_handlers({
-        function(server_name)
-          -- csharp_ls is configured separately in user.unity (Unity/.sln aware)
-          if server_name ~= 'csharp_ls' then
-            lspconfig[server_name].setup({ capabilities = capabilities })
-          end
-        end,
+      -- Applies to every server mason-lspconfig auto-enables below.
+      vim.lsp.config('*', { capabilities = capabilities })
+
+      require('mason-lspconfig').setup({
+        ensure_installed = { 'lua_ls', 'csharp_ls', 'gopls' },
+        -- csharp_ls is configured separately in user.unity (Unity/.sln aware)
+        automatic_enable = { exclude = { 'csharp_ls' } },
       })
 
-      require('user.unity').setup(lspconfig, capabilities)
+      require('user.unity').setup(capabilities)
     end,
   },
 }

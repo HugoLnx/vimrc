@@ -1,5 +1,9 @@
 return {
   'nvim-treesitter/nvim-treesitter',
+  -- main was rewritten as a different, incompatible plugin (no more
+  -- nvim-treesitter.configs); master keeps the classic setup() API this
+  -- config uses.
+  branch = 'master',
   build = ':TSUpdate',
   config = function()
     require('nvim-treesitter.configs').setup({

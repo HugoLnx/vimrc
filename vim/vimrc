@@ -94,5 +94,5 @@ endfunction
 
 " Classic-Vim-only plugins (never loaded under Neovim, which uses lazy.nvim)
 if !has('nvim')
-  execute 'source ' . fnameescape(expand('<sfile>:p:h') . '/plugins.vim')
+  execute 'source ' . fnameescape(fnamemodify(resolve(expand('<sfile>:p')), ':h') . '/plugins.vim')
 endif
