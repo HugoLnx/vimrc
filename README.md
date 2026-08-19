@@ -11,6 +11,7 @@ vim/plugins.vim       classic-Vim-only plugin list (vim-plug); never loaded by N
 vim/syntax/html/*     HTML5/ARIA/RDFa syntax files for classic Vim (Neovim gets this via treesitter)
 nvim/init.lua         Neovim entrypoint: sources vim/vimrc, then bootstraps lazy.nvim + Lua plugins
 nvim/lua/user/        Neovim-only Lua config (options, keymaps, plugins, LSP, Unity)
+repo-configs/         .gitignore/.gitattributes templates + apply.sh, symlinked to each home
 _config.sample.yml    versioned template for config.yml
 config.yml            your home-directory paths (gitignored, not versioned)
 install/symlink.py    reads config.yml, symlinks this repo's config into each listed home
@@ -91,6 +92,23 @@ copying, same as the native-Windows fallback.
 | classic Vim runtime dir | `~/.vim/` | `%USERPROFILE%\vimfiles\` |
 | Neovim config | `~/.config/nvim/init.lua` | `%LOCALAPPDATA%\nvim\init.lua` |
 | Neovim data (plugins) | `~/.local/share/nvim/` | `%LOCALAPPDATA%\nvim-data\` |
+
+## repo-configs
+
+`repo-configs/gitignore` and `repo-configs/gitattributes` are templates you
+can drop into any repository. The installer symlinks `repo-configs/` into
+each configured home directory (as `~/repo-configs`, or
+`%USERPROFILE%\repo-configs` on Windows), so it's reachable from anywhere.
+To apply the templates to the repository you're currently in:
+
+```sh
+~/repo-configs/apply.sh
+```
+
+This copies the templates into the current working directory as
+`.gitignore` and `.gitattributes` (not symlinks, since each repo may want
+to tweak its own copy — e.g. the "Project-specific rules" section at the
+top of `.gitignore`).
 
 ## Plugins
 

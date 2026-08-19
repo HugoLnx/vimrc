@@ -27,6 +27,7 @@ def layout_for(os_name, home):
                 ('vim/vimrc', home / '.vimrc', False),
                 ('vim/syntax/html', home / '.vim' / 'syntax' / 'html', False),
                 ('nvim', home / '.config' / 'nvim', False),
+                ('repo-configs', home / 'repo-configs', False),
             ],
         }
     if os_name == 'windows':
@@ -36,6 +37,7 @@ def layout_for(os_name, home):
                 ('vim/vimrc', home / '_vimrc', False),
                 ('vim/syntax/html', home / 'vimfiles' / 'syntax' / 'html', False),
                 ('nvim', home / 'AppData' / 'Local' / 'nvim', False),
+                ('repo-configs', home / 'repo-configs', False),
             ],
         }
     raise ValueError(f"Unknown os '{os_name}' (expected linux, mac, or windows)")
