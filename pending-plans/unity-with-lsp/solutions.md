@@ -1,3 +1,15 @@
+> **Update (2026-09-02):** The LSP and Unity-integration scope below has
+> since been finalized and narrowed by explicit user decision — see
+> `plan.md`'s header. Windows uses `seblyng/roslyn.nvim` natively (no
+> WSL bridge, no dual-LSP layering); WSL keeps `csharp_ls` only, with no
+> Unity Editor integration at all. Sections 1 and 3 below (the LSP options
+> table and the Unity Editor integration table) remain accurate as
+> background research and were re-verified with a fresh README fetch of
+> `apyra/nvim-unity` and `walcht/com.walcht.ide.neovim`, but their
+> "Recommendation" framing (layering, optional bridge) is superseded by
+> `plan.md`. Section 2 (AI tool integration) is out of scope for the current
+> plan and untouched.
+
 # Solutions: C# LSP, AI tooling, and Unity Editor integration for Neovim
 
 Synthesized from `research/01-csharp-lsp-servers.md`, `research/02-ai-tool-integration.md`,
@@ -85,6 +97,28 @@ alongside it later if "Unity doesn't see files created in Neovim until refocused
 becomes a real pain point — it's small, independent, and additive; not needed for the
 open-at-line TODO itself. Skip `apyra/nvim-unity`: its jump-to-line support is
 unconfirmed and its own field reports raise config-compatibility concerns.
+
+---
+
+## 4. Unity live-debugging integration (Windows/PowerShell only)
+
+Synthesized from `research/05-unity-debugging.md`. Two candidates were
+compared, both attaching to Unity's Mono soft-debugger endpoint via a DAP
+front end:
+
+| Tool | Setup effort (Windows) | Backend licensing | IL2CPP |
+|---|---|---|---|
+| `ownself/nvim-dap-unity` (drives Microsoft's `vstuc` debug adapter) | Low — plugin auto-downloads `vstuc` via PowerShell | **Unresolved**: a web search claims `vstuc`'s license restricts it to Microsoft Visual Studio products; a direct fetch of the license-terms page found no such clause in the retrieved text. Sources disagree — not confirmed either way. | Unverified/likely unsupported |
+| **`walcht/unity-dap`** (own `Mono.Debugger.Soft`-based DAP server) | Low-medium — prebuilt `win-x64` release exists (download + extract); no Neovim plugin automates the fetch, so `dap.adapters`/`dap.configurations` Lua is added by hand | MIT, unambiguous | Explicitly, permanently unsupported by design |
+
+**Decision: adopt `walcht/unity-dap`.** Chosen over `nvim-dap-unity`
+specifically to avoid the unresolved `vstuc` licensing question — MIT
+licensing here is unambiguous, and it shares the same author/ecosystem as
+the already-adopted `com.walcht.ide.neovim`. Trade-off accepted: IL2CPP
+debugging is permanently out of scope (Editor/Mono-player debugging only,
+which covers normal Unity Editor Play-mode debugging), and setup is manual
+Lua (no plugin automates it) rather than `nvim-dap-unity`'s one-line
+`setup({})`. See `plan.md` Step 4 for the concrete execution steps.
 
 ---
 
