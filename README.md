@@ -24,6 +24,54 @@ from both editors. Plugin management is fully separate per editor: classic
 Vim uses vim-plug (`vim/plugins.vim`), Neovim uses lazy.nvim
 (`nvim/lua/user/plugins/`).
 
+## Dependencies
+
+This repo's installer only symlinks config files and installs editor
+plugins; the external tools below are assumed to already be on PATH.
+
+**Both platforms:**
+
+- [Git](https://git-scm.com/downloads)
+- [Neovim](https://github.com/neovim/neovim/blob/master/INSTALL.md) —
+  `roslyn.nvim` needs ≥0.12 — plus, optionally, classic
+  [Vim](https://www.vim.org/download.php)
+- [Python 3](https://www.python.org/downloads/) and
+  [PyYAML](https://pypi.org/project/PyYAML/) — used by `install/symlink.py`
+- A C compiler — needed to build treesitter parsers (`:TSUpdate`); see
+  [nvim-treesitter's requirements](https://github.com/nvim-treesitter/nvim-treesitter#requirements)
+- [ripgrep](https://github.com/BurntSushi/ripgrep#installation) — Telescope
+  live-grep and ctrlp.vim's grep integration
+- [Go](https://go.dev/doc/install) — `gopls`, installed automatically via
+  mason.nvim
+- [.NET SDK](https://dotnet.microsoft.com/en-us/download) — `csharp_ls` /
+  `roslyn`, also installed via mason.nvim; without `dotnet` on PATH the C#
+  LSP is silently skipped (see `nvim/lua/user/plugins/lsp.lua`)
+- [Claude Code CLI](https://docs.claude.com/en/docs/claude-code/overview),
+  logged in — drives `claudecode.nvim`
+- [git-lfs](https://git-lfs.com/) — used by the shared `gitconfig`'s LFS
+  filter
+
+See mason.nvim's own
+[requirements](https://github.com/williamboman/mason.nvim#requirements) for
+the baseline tools (unzip/tar, curl or wget, etc.) it needs to install and
+manage LSP/DAP packages.
+
+**Optional:**
+
+- [make](https://www.gnu.org/software/make/) — builds Telescope's optional
+  `telescope-fzf-native` perf extension (skipped automatically if absent)
+- [tmux](https://github.com/tmux/tmux/wiki/Installing) — `vim-tmux-navigator`
+  is a no-op without it
+
+**Windows/PowerShell only** (see "Unity / C#" below for how these fit
+together):
+
+- [Unity Editor](https://unity.com/download) (via Unity Hub)
+- [walcht/com.walcht.ide.neovim](https://github.com/walcht/com.walcht.ide.neovim) —
+  installed manually into a Unity project via the Package Manager
+- [walcht/unity-dap](https://github.com/walcht/unity-dap/releases) — the
+  `win-x64` adapter binary is downloaded manually from its releases page
+
 ## Install
 
 ```sh
@@ -120,10 +168,13 @@ top of `.gitignore`).
 ## Plugins
 
 **Neovim** (lazy.nvim): nvim-treesitter, nvim-lspconfig + mason.nvim (LSP,
-including `csharp_ls` for Unity), blink.cmp (completion), supermaven-nvim (AI
-inline completions, Neovim-only), telescope.nvim (fuzzy finder), lualine.nvim,
-gitsigns.nvim, kanagawa.nvim, plus vim-tmux-navigator and vim-visual-multi
-(also usable under Neovim).
+including `csharp_ls` for Unity on WSL/Linux/macOS and `roslyn.nvim` on
+Windows), nvim-dap (debugging, `unity-dap` on Windows), blink.cmp
+(completion), supermaven-nvim (AI inline completions, Neovim-only),
+telescope.nvim (fuzzy finder), lualine.nvim, gitsigns.nvim, kanagawa.nvim,
+plus vim-tmux-navigator and vim-visual-multi (also usable under Neovim).
+Windows additionally gets `apyra/nvim-unity-sync` (keeps a Unity project's
+`.csproj` in sync with files added/renamed/deleted in Neovim).
 
 **Classic Vim** (vim-plug): ctrlp.vim, kanagawa.vim,
 vim-visual-multi, ALE, vim-tmux-navigator.
@@ -136,18 +187,36 @@ value now that LSP covers Go, and Pug is no longer used).
 
 ## Unity / C#
 
-Neovim gets real C# editing via treesitter (`c_sharp` parser) + `csharp-ls`
-(installed automatically through mason.nvim, configured in
-`nvim/lua/user/unity.lua`).
+Neovim gets real C# editing via treesitter (`c_sharp` parser) plus an LSP
+that's split by OS, since the Unity Editor itself only runs on Windows:
+
+- **WSL/Linux/macOS**: `csharp_ls` (installed automatically through
+  mason.nvim). No Unity Editor integration and no debugging integration —
+  editing only.
+- **Windows**: Microsoft's Roslyn LSP via `seblyng/roslyn.nvim` (installed
+  through mason.nvim's `Crashdummyy/mason-registry`), plus full Unity
+  Editor integration:
+  - **`walcht/com.walcht.ide.neovim`** (Unity package, installed via
+    Unity's Package Manager from
+    `https://github.com/walcht/com.walcht.ide.neovim.git`, then selected as
+    the External Script Editor under *Edit > Preferences > External
+    Tools*) — double-click a script or a Console error in Unity to
+    open/jump-to-line in the running Neovim instance.
+  - **`apyra/nvim-unity-sync`** — keeps the `.csproj` in sync as `.cs`
+    files are added/renamed/deleted from Neovim, without needing Unity
+    focused.
+  - **`walcht/unity-dap`** (`nvim/lua/user/unity_dap.lua`) — live
+    attach-debugging against Unity's Mono soft-debugger via nvim-dap.
+    Editor/Mono-player only; IL2CPP isn't supported. Requires downloading
+    the `win-x64` adapter release separately (see the file's header
+    comment).
+
+This split (which server, which OS gets Unity Editor/debugging
+integration) is implemented in `nvim/lua/user/unity.lua`,
+`nvim/lua/user/plugins/lsp.lua`, and `nvim/lua/user/plugins/dap.lua`.
 
 One-time setup per Unity project: **Edit > Preferences > External Tools >
 "Generate .csproj files for..."** — enable it for all categories. Regenerate
 (Unity usually does this automatically on script/package changes; if not,
-use *Assets > Open C# Project*) whenever packages or asmdefs change, so
-csharp-ls's view of the `.sln`/`.csproj` files stays current.
-
-**TODO:** wire up "double-click a script in Unity to jump to file:line in a
-running Neovim instance" (via `nvim --server`/`--remote` and small
-cross-platform wrapper scripts). Not built yet — in the meantime, point
-Unity's External Script Editor at VS Code or Rider for that convenience;
-actual editing happens in Neovim.
+use *Assets > Open C# Project*) whenever packages or asmdefs change, so the
+LSP's view of the `.sln`/`.csproj` files stays current.
