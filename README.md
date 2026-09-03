@@ -143,17 +143,17 @@ copying, same as the native-Windows fallback.
 
 | | Linux / macOS | Windows |
 |---|---|---|
-| classic Vim config | `~/.vimrc` | `%USERPROFILE%\_vimrc` |
-| classic Vim runtime dir | `~/.vim/` | `%USERPROFILE%\vimfiles\` |
-| Neovim config | `~/.config/nvim/init.lua` | `%LOCALAPPDATA%\nvim\init.lua` |
-| Neovim data (plugins) | `~/.local/share/nvim/` | `%LOCALAPPDATA%\nvim-data\` |
+| classic Vim config | `~/.vimrc` | `$env:USERPROFILE\_vimrc` |
+| classic Vim runtime dir | `~/.vim/` | `$env:USERPROFILE\vimfiles\` |
+| Neovim config | `~/.config/nvim/init.lua` | `$env:LOCALAPPDATA\nvim\init.lua` |
+| Neovim data (plugins) | `~/.local/share/nvim/` | `$env:LOCALAPPDATA\nvim-data\` |
 
 ## repo-configs
 
 `repo-configs/gitignore` and `repo-configs/gitattributes` are templates you
 can drop into any repository. The installer symlinks `repo-configs/` into
 each configured home directory (as `~/repo-configs`, or
-`%USERPROFILE%\repo-configs` on Windows), so it's reachable from anywhere.
+`$env:USERPROFILE\repo-configs` on Windows), so it's reachable from anywhere.
 To apply the templates to the repository you're currently in:
 
 ```sh
@@ -242,7 +242,7 @@ Steps to wire a new Unity project into this config's Windows integration
 6. Download the `win-x64` asset from
    [walcht/unity-dap](https://github.com/walcht/unity-dap/releases),
    extract `unity-debug-adapter.exe` somewhere stable (e.g.
-   `%LOCALAPPDATA%\unity-dap\unity-debug-adapter.exe`), and update the
+   `$env:LOCALAPPDATA\unity-dap\unity-debug-adapter.exe`), and update the
    `command` path in `nvim/lua/user/unity_dap.lua`'s `dap.adapters.unity`
    to point at it if it's not already on PATH.
 7. Open Neovim on Windows once so `lazy.nvim`/`mason.nvim` install

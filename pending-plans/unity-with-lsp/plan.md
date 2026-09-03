@@ -175,7 +175,7 @@ the way `nvim-dap-unity` does for `vstuc`.
 2. **Download the debug adapter** (Windows): grab the `win-x64` asset from
    `https://github.com/walcht/unity-dap/releases` (latest at last check:
    `v0.1.0`) and extract `unity-debug-adapter.exe` somewhere stable, e.g.
-   `%LOCALAPPDATA%\unity-dap\unity-debug-adapter.exe`. Confirm Mono is on
+   `$env:LOCALAPPDATA\unity-dap\unity-debug-adapter.exe`. Confirm Mono is on
    PATH on the Windows side (Unity ships its own Mono; verify the adapter
    can find/use it — check `unity-dap`'s README if it fails to start).
 3. **New file**: `nvim/lua/user/unity_dap.lua` (Windows-gated, parallel to

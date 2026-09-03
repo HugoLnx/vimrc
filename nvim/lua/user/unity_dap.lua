@@ -5,7 +5,7 @@
 --   1. Download the win-x64 release asset from
 --      https://github.com/walcht/unity-dap/releases and extract
 --      unity-debug-adapter.exe somewhere stable, e.g.
---      %LOCALAPPDATA%\unity-dap\unity-debug-adapter.exe. Update the
+--      $env:LOCALAPPDATA\unity-dap\unity-debug-adapter.exe. Update the
 --      `command` path below to match.
 --   2. With the Unity Editor running and Play mode active, trigger dap
 --      attach and pick "Attach to Unity Editor [Mono]". The port is in
