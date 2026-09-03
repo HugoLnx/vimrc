@@ -47,9 +47,6 @@ return {
       if csharp_lsp_enabled and not is_windows then
         table.insert(ensure_installed, 'csharp_ls')
       end
-      if csharp_lsp_enabled and is_windows then
-        table.insert(ensure_installed, 'roslyn')
-      end
 
       require('mason-lspconfig').setup({
         ensure_installed = ensure_installed,
@@ -58,6 +55,18 @@ return {
         -- via the roslyn.nvim plugin spec below.
         automatic_enable = { exclude = { 'csharp_ls', 'roslyn' } },
       })
+
+      if csharp_lsp_enabled and is_windows then
+        -- roslyn isn't an nvim-lspconfig server, so mason-lspconfig's
+        -- ensure_installed rejects it; install the Mason package directly.
+        local mr = require('mason-registry')
+        mr.refresh(function()
+          local pkg = mr.get_package('roslyn')
+          if not pkg:is_installed() then
+            pkg:install()
+          end
+        end)
+      end
 
       if csharp_lsp_enabled then
         require('user.unity').setup(capabilities)
