@@ -14,4 +14,6 @@ require('user.options')
 require('user.keymaps')
 require('user.lazy-bootstrap')
 
-require('lazy').setup(require('user.plugins'))
+require('lazy').setup(require('user.plugins'), {
+  rocks = { enabled = false },
+})
