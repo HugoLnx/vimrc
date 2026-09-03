@@ -10,6 +10,5 @@ return {
   require('user.plugins.colorscheme'),
   require('user.plugins.statusline'),
   require('user.plugins.gitsigns'),
-  require('user.plugins.claudecode'),
   unpack(require('user.plugins.misc')),
 }

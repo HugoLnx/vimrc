@@ -46,8 +46,6 @@ plugins; the external tools below are assumed to already be on PATH.
 - [.NET SDK](https://dotnet.microsoft.com/en-us/download) — `csharp_ls` /
   `roslyn`, also installed via mason.nvim; without `dotnet` on PATH the C#
   LSP is silently skipped (see `nvim/lua/user/plugins/lsp.lua`)
-- [Claude Code CLI](https://docs.claude.com/en/docs/claude-code/overview),
-  logged in — drives `claudecode.nvim`
 - [git-lfs](https://git-lfs.com/) — used by the shared `gitconfig`'s LFS
   filter
 
@@ -290,8 +288,6 @@ installed and working, independent of any specific project:
       results
 - [ ] gitsigns.nvim: the sign column shows changes in a modified git file
 - [ ] lualine.nvim statusline renders correctly
-- [ ] claudecode.nvim: the Claude Code CLI launches from Neovim and
-      responds
 - [ ] nvim-dap: a breakpoint can be set and hit for at least one
       configured adapter
 - [ ] vim-tmux-navigator: pane navigation crosses between tmux and Neovim
