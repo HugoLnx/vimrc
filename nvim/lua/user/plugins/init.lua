@@ -3,6 +3,7 @@
 return {
   require('user.plugins.treesitter'),
   require('user.plugins.lsp'),
+  require('user.plugins.dap'),
   require('user.plugins.completion'),
   require('user.plugins.supermaven'),
   require('user.plugins.telescope'),
