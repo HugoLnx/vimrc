@@ -26,7 +26,7 @@ function M.setup()
   dap.adapters.unity = function(cb, _config)
     cb({
       type = 'executable',
-      command = 'unity-debug-adapter.exe', -- adjust to the extracted path
+      command = vim.fn.expand('$LOCALAPPDATA/unity-dap/unity-debug-adapter.exe'),
       args = { '--log-level=warn' },
     })
   end

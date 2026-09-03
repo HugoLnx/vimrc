@@ -83,6 +83,7 @@ return {
     -- focused. Windows only, same as roslyn.nvim above.
     'apyra/nvim-unity-sync',
     cond = function() return vim.fn.has('win32') == 1 end,
+    main = 'unity.plugin',
     opts = {},
   },
 }
