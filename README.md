@@ -220,3 +220,80 @@ One-time setup per Unity project: **Edit > Preferences > External Tools >
 (Unity usually does this automatically on script/package changes; if not,
 use *Assets > Open C# Project*) whenever packages or asmdefs change, so the
 LSP's view of the `.sln`/`.csproj` files stays current.
+
+## Unity Project setup
+
+Steps to wire a new Unity project into this config's Windows integration
+(Unity Editor open/jump-to-line, `.csproj` sync, live debugging):
+
+1. Confirm Unity Editor is installed (via Unity Hub) and that the Windows
+   Neovim install is ≥0.12 (`roslyn.nvim`'s floor).
+2. In the Unity project: **Package Manager → Install package from git
+   URL** → `https://github.com/walcht/com.walcht.ide.neovim.git`.
+3. Restart Unity, then set **Edit > Preferences > External Tools >
+   External Script Editor** to "Neovim".
+4. In Unity's **Neovim → Settings** panel: leave the Windows defaults
+   (loopback TCP socket, random port); set the terminal to Windows
+   Terminal (`wt`) with PowerShell.
+5. Enable **Edit > Preferences > External Tools > "Generate .csproj files
+   for..."** for all categories (see "Unity / C#" above — one-time per
+   project, regenerate via *Assets > Open C# Project* whenever packages or
+   asmdefs change).
+6. Download the `win-x64` asset from
+   [walcht/unity-dap](https://github.com/walcht/unity-dap/releases),
+   extract `unity-debug-adapter.exe` somewhere stable (e.g.
+   `%LOCALAPPDATA%\unity-dap\unity-debug-adapter.exe`), and update the
+   `command` path in `nvim/lua/user/unity_dap.lua`'s `dap.adapters.unity`
+   to point at it if it's not already on PATH.
+7. Open Neovim on Windows once so `lazy.nvim`/`mason.nvim` install
+   `roslyn`, `roslyn.nvim`, and `nvim-unity-sync` (their specs are
+   Windows-only).
+
+**Verification checklist:**
+
+- [ ] Double-click a `.cs` file in Unity's Project window → opens at the
+      right file in the running Neovim instance
+- [ ] Double-click a compiler error in the Console → cursor jumps to the
+      exact line/column in Neovim
+- [ ] Restart Unity Editor → the Neovim integration reconnects without
+      reconfiguring
+- [ ] Open a Unity `.cs` file in Neovim, run `:LspInfo` → `roslyn` (not
+      `csharp_ls`) is attached and `UnityEngine`/custom project types
+      resolve
+- [ ] Create/rename/delete a `.cs` file from Neovim (Unity not focused) →
+      the `.csproj`'s `<Compile>` entries update and Roslyn picks up the
+      change without waiting for Unity to regenerate
+- [ ] With the Unity Editor running and Play mode active, trigger a
+      `nvim-dap` attach, pick "Attach to Unity Editor [Mono]", enter
+      `127.0.0.1` and the port from Unity's `Editor.log`
+      (`--debugger-agent=...address=127.0.0.1:<port>`) → a breakpoint in
+      a `MonoBehaviour` script is hit
+
+## Tools health checklist
+
+General checklist to confirm the Neovim tooling in this config is
+installed and working, independent of any specific project:
+
+- [ ] `:checkhealth` reports no errors for core Neovim health
+- [ ] `:Lazy` shows all plugins installed with no failed installs (and,
+      on WSL/Linux/macOS, that `roslyn.nvim`/`nvim-unity-sync` are
+      correctly skipped via their Windows-only `cond`)
+- [ ] `:Mason` shows the expected LSP/DAP servers installed (`csharp_ls`
+      or `roslyn`, `gopls`, etc.)
+- [ ] `:TSUpdate` completes, and treesitter highlighting works in a
+      `.cs`, `.go`, and `.lua` file
+- [ ] Open a source file, run `:LspInfo` → the expected LSP server
+      attaches; hover (`K`) and go-to-definition work
+- [ ] blink.cmp: a completion popup appears while typing
+- [ ] supermaven-nvim: an inline AI suggestion appears while typing
+- [ ] Telescope: fuzzy-find and live-grep (ripgrep-backed) both return
+      results
+- [ ] gitsigns.nvim: the sign column shows changes in a modified git file
+- [ ] lualine.nvim statusline renders correctly
+- [ ] claudecode.nvim: the Claude Code CLI launches from Neovim and
+      responds
+- [ ] nvim-dap: a breakpoint can be set and hit for at least one
+      configured adapter
+- [ ] vim-tmux-navigator: pane navigation crosses between tmux and Neovim
+      splits (if using tmux)
+- [ ] vim-visual-multi: multi-cursor editing works
