@@ -10,5 +10,6 @@ return {
   require('user.plugins.colorscheme'),
   require('user.plugins.statusline'),
   require('user.plugins.gitsigns'),
+  require('user.plugins.nvim-tree'),
   unpack(require('user.plugins.misc')),
 }
