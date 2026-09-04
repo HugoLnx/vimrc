@@ -40,6 +40,9 @@ Reference for every keyboard shortcut available in this repo's Neovim setup
 | `K` | n, v | Jump 10 lines up |
 | `[d` | n | Previous diagnostic |
 | `]d` | n | Next diagnostic |
+| `<C-d>` / `<C-u>` | n | Half-page down / up **(Neovim default)** |
+| `<C-w> s` / `<C-w> v` | n | Split window horizontally / vertically **(Neovim default)** |
+| `<C-w> h/j/k/l` | n | Move to window left/down/up/right **(Neovim default)** |
 
 ### Editing
 
