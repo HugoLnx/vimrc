@@ -1,6 +1,10 @@
 " Classic-Vim-only plugin declarations (vim-plug). Never sourced by Neovim,
 " which manages its own plugins via lazy.nvim (see nvim/lua/user/plugins/).
 
+" WSL-only: vim-tmux-navigator is a no-op without tmux (has('wsl') doesn't
+" exist in classic Vim; detect via the WSL_DISTRO_NAME env var WSL sets).
+let s:is_wsl = !empty($WSL_DISTRO_NAME)
+
 if has('win32') || has('win64')
   call plug#begin('~/vimfiles/plugged')
 else
@@ -11,8 +15,25 @@ Plug 'ctrlpvim/ctrlp.vim'
 Plug 'menisadi/kanagawa.vim'
 Plug 'mg979/vim-visual-multi'
 Plug 'dense-analysis/ale'
+if s:is_wsl
+  Plug 'christoomey/vim-tmux-navigator'
+endif
 
 call plug#end()
+
+if s:is_wsl
+  let g:tmux_navigator_no_mappings = 1
+  nnoremap <silent> <C-w>h :TmuxNavigateLeft<cr>
+  nnoremap <silent> <C-w>j :TmuxNavigateDown<cr>
+  nnoremap <silent> <C-w>k :TmuxNavigateUp<cr>
+  nnoremap <silent> <C-w>l :TmuxNavigateRight<cr>
+  if has('terminal')
+    tnoremap <silent> <C-w>h <C-w>:TmuxNavigateLeft<cr>
+    tnoremap <silent> <C-w>j <C-w>:TmuxNavigateDown<cr>
+    tnoremap <silent> <C-w>k <C-w>:TmuxNavigateUp<cr>
+    tnoremap <silent> <C-w>l <C-w>:TmuxNavigateRight<cr>
+  endif
+endif
 
 " Ctrl+P: also show hidden (dotfile) files, but always exclude .git/
 let g:ctrlp_show_hidden = 1

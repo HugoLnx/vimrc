@@ -73,6 +73,10 @@ Reference for every keyboard shortcut available in this repo's Neovim setup
 | `<C-w> h/j/k/l` | n | Move to window left/down/up/right |
 | `gp` / `gP` | n | Paste after/before, leave cursor after pasted text |
 
+> On WSL, `<C-w> h/j/k/l` is overridden by vim-tmux-navigator (see
+> "Window / Pane" under Plugin below) to also cross into tmux panes;
+> elsewhere it's this vanilla built-in.
+
 ---
 
 ## Plugin
@@ -193,6 +197,23 @@ Everything else is a built-in default **(plugin default)**:
 | `Tab` | multi-cursor mode | Switch between cursor and extend mode |
 | `q` | multi-cursor mode | Remove current cursor |
 | `<Esc>` | multi-cursor mode | Exit multi-cursor mode |
+
+### Window / Pane (vim-tmux-navigator, WSL only)
+
+Only loaded on WSL (`nvim/lua/user/plugins/misc.lua`) — a no-op without
+tmux, and this repo is otherwise Windows-first. Its own `<C-h/j/k/l>`
+defaults are disabled (`g:tmux_navigator_no_mappings = 1`) and remapped
+onto `<C-w> h/j/k/l` to match the vanilla Neovim window-navigation keys
+above, so the same keys cross from a Neovim split into a tmux pane once
+they hit a window boundary. Also mapped in terminal-mode (`:terminal`
+buffers), where `<C-w>` isn't a window-command prefix by default:
+
+| Key | Mode | Action |
+|---|---|---|
+| `<C-w> h` | n, t | Navigate to window/pane left |
+| `<C-w> j` | n, t | Navigate to window/pane down |
+| `<C-w> k` | n, t | Navigate to window/pane up |
+| `<C-w> l` | n, t | Navigate to window/pane right |
 
 ### Debugging (nvim-dap)
 
