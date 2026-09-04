@@ -6,8 +6,10 @@ Reference for every keyboard shortcut available in this repo's Neovim setup
 
 - **Leader key**: `<Space>` (`nvim/lua/user/options.lua`)
 - Shortcuts are grouped by **Custom** (hand-written in this repo, in
-  `vim/vimrc` or `nvim/lua/user/keymaps.lua`) vs **Plugin** (comes from a
-  plugin, either configured here or the plugin's own built-in default).
+  `vim/vimrc` or `nvim/lua/user/keymaps.lua`), **Plugin** (comes from a
+  plugin, either configured here or the plugin's own built-in default),
+  or **Neovim Built-in** (vanilla Neovim defaults — not written anywhere
+  in this repo's config and not from a plugin).
 - Entries with no trailing note are configured explicitly in this repo.
   Entries marked **(plugin default)** are *not* written anywhere in this
   repo's config — they're the plugin's own built-in binding, listed here
@@ -17,18 +19,6 @@ Reference for every keyboard shortcut available in this repo's Neovim setup
 ---
 
 ## Custom
-
-### Shortcut Highlights
-
-| Key | Mode | Action |
-|---|---|---|
-| `<leader>tt` | n | Toggle file tree (NvimTree) |
-| `<leader>tf` | n | Find current file in tree |
-| `<leader>e` | n | Show diagnostic under cursor |
-| `H` / `L` | n | Previous / next tab |
-| `J` / `K` | n, v | Jump 10 lines down / up |
-| `X` | n | Format entire file |
-| `<C-n>` | n | Clear search highlight |
 
 ### Navigation
 
@@ -40,9 +30,6 @@ Reference for every keyboard shortcut available in this repo's Neovim setup
 | `K` | n, v | Jump 10 lines up |
 | `[d` | n | Previous diagnostic |
 | `]d` | n | Next diagnostic |
-| `<C-d>` / `<C-u>` | n | Half-page down / up **(Neovim default)** |
-| `<C-w> s` / `<C-w> v` | n | Split window horizontally / vertically **(Neovim default)** |
-| `<C-w> h/j/k/l` | n | Move to window left/down/up/right **(Neovim default)** |
 
 ### Editing
 
@@ -77,23 +64,20 @@ Reference for every keyboard shortcut available in this repo's Neovim setup
 
 ---
 
-## Plugin
-
-### Telescope
-
-#### Highlights
+## Neovim Built-in
 
 | Key | Mode | Action |
 |---|---|---|
-| `<leader>ff` | n | Find files |
-| `<leader>fg` | n | Live grep |
-| `<leader>fb` | n | List open buffers |
-| `<leader>fh` | n | Search help tags |
-| `<CR>` | insert | Confirm selection |
-| `<C-v>` | insert | Open in vertical split |
-| `<Esc>` | insert | Close picker |
+| `<C-d>` / `<C-u>` | n | Half-page down / up |
+| `<C-w> s` / `<C-w> v` | n | Split window horizontally / vertically |
+| `<C-w> h/j/k/l` | n | Move to window left/down/up/right |
+| `gp` / `gP` | n | Paste after/before, leave cursor after pasted text |
 
-#### All Bindings
+---
+
+## Plugin
+
+### Telescope
 
 Launch keys (configured in `nvim/lua/user/plugins/telescope.lua`):
 
@@ -119,18 +103,6 @@ Inside an open Telescope picker **(plugin default)**:
 
 ### LSP
 
-#### Highlights
-
-| Key | Mode | Action |
-|---|---|---|
-| `gd` | n | Go to definition |
-| `gr` | n | List references |
-| `gs` | n | Show hover docs |
-| `<leader>rn` | n | Rename symbol |
-| `<leader>ca` | n | Code action |
-
-#### All Bindings
-
 Buffer-local, set on attach (`nvim/lua/user/plugins/lsp.lua`), applies to
 any attached server (lua_ls, gopls, csharp_ls/roslyn, etc.):
 
@@ -147,19 +119,6 @@ any attached server (lua_ls, gopls, csharp_ls/roslyn, etc.):
 > `K` now always jumps up, even in LSP-attached buffers.
 
 ### Completion (blink.cmp)
-
-#### Highlights
-
-| Key | Mode | Action |
-|---|---|---|
-| `<C-space>` | insert | Open/trigger completion menu |
-| `<C-j>` | insert | Next completion item |
-| `<C-k>` | insert | Previous completion item |
-| `<C-h>` | insert | Accept selected item |
-| `<C-\>` | insert | Toggle signature help |
-| `<C-e>` | insert | Cancel/hide menu |
-
-#### All Bindings
 
 Based on the built-in `"default"` preset, with `<C-n>`/`<C-p>`/`<C-y>`
 disabled, `<C-j>`/`<C-k>`/`<C-h>` added in their place, and `show_signature`
@@ -179,16 +138,6 @@ moved off `<C-k>` onto `<C-\>` (`nvim/lua/user/plugins/completion.lua`):
 
 ### AI Suggestions (Supermaven)
 
-#### Highlights
-
-| Key | Mode | Action |
-|---|---|---|
-| `<C-y>` | insert | Accept suggestion |
-| `<C-l>` | insert | Accept one word of suggestion |
-| `<C-]>` | insert | Clear suggestion |
-
-#### All Bindings
-
 Configured explicitly (`nvim/lua/user/plugins/supermaven.lua`) — its own
 Tab/Enter defaults are disabled to avoid clashing with blink.cmp:
 
@@ -199,20 +148,6 @@ Tab/Enter defaults are disabled to avoid clashing with blink.cmp:
 | `<C-]>` | insert | Clear suggestion |
 
 ### File Explorer (nvim-tree)
-
-#### Highlights
-
-| Key | Mode | Action |
-|---|---|---|
-| `<CR>` / `o` | n | Open file/directory |
-| `a` | n | Create file/directory |
-| `d` | n | Delete |
-| `r` | n | Rename |
-| `x` / `p` | n | Cut / paste |
-| `H` | n | Toggle hidden files |
-| `R` | n | Refresh tree |
-
-#### All Bindings
 
 Not customized in this repo (`opts = {}`) — built-in defaults
 **(plugin default)**:
@@ -232,19 +167,6 @@ Not customized in this repo (`opts = {}`) — built-in defaults
 
 ### Git (gitsigns)
 
-#### Highlights
-
-| Key | Mode | Action |
-|---|---|---|
-| `]c` | n | Next hunk |
-| `[c` | n | Previous hunk |
-| `<leader>hs` | n, v | Stage hunk |
-| `<leader>hr` | n, v | Reset hunk |
-| `<leader>hp` | n | Preview hunk |
-| `<leader>hb` | n | Blame line |
-
-#### All Bindings
-
 Not customized in this repo (`opts = {}`) — built-in defaults
 **(plugin default)**:
 
@@ -258,18 +180,6 @@ Not customized in this repo (`opts = {}`) — built-in defaults
 | `<leader>hb` | n | Blame line |
 
 ### Multi-cursor (vim-visual-multi)
-
-#### Highlights
-
-| Key | Mode | Action |
-|---|---|---|
-| `<C-g>` | n | Select word under cursor / add next match |
-| `<C-Down>` / `<C-Up>` | n | Add cursor below/above |
-| `Tab` | multi-cursor mode | Switch between cursor and extend mode |
-| `q` | multi-cursor mode | Remove current cursor |
-| `<Esc>` | multi-cursor mode | Exit multi-cursor mode |
-
-#### All Bindings
 
 `Find Under` / `Find Subword Under` remapped from the plugin default
 (`<C-n>`) to `<C-g>` via `g:VM_maps` in `nvim/lua/user/plugins/misc.lua`,
@@ -285,18 +195,6 @@ Everything else is a built-in default **(plugin default)**:
 | `<Esc>` | multi-cursor mode | Exit multi-cursor mode |
 
 ### Debugging (nvim-dap)
-
-#### Highlights
-
-| Key | Mode | Action |
-|---|---|---|
-| `<A-b>` / `<F9>` | n | Toggle breakpoint |
-| `<A-c>` / `<F5>` | n | Continue / start |
-| `<A-s>` / `<F10>` | n | Step over |
-| `<A-j>` / `<F11>` | n | Step into |
-| `<A-k>` / `<S-F11>` | n | Step out |
-
-#### All Bindings
 
 Configured explicitly (`nvim/lua/user/plugins/dap.lua`) — each action is
 bound to both an Alt-key and an F-key form:
