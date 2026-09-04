@@ -281,29 +281,6 @@ Everything else is a built-in default **(plugin default)**:
 | `q` | multi-cursor mode | Remove current cursor |
 | `<Esc>` | multi-cursor mode | Exit multi-cursor mode |
 
-### Window / Pane (vim-tmux-navigator)
-
-#### Highlights
-
-| Key | Mode | Action |
-|---|---|---|
-| `<C-h>` | n | Navigate to pane left |
-| `<C-j>` | n | Navigate to pane below |
-| `<C-k>` | n | Navigate to pane above |
-| `<C-l>` | n | Navigate to pane right |
-
-#### All Bindings
-
-Not customized in this repo — built-in defaults **(plugin default)**, no-op
-without tmux running:
-
-| Key | Mode | Action |
-|---|---|---|
-| `<C-h>` | n | Navigate to pane left |
-| `<C-j>` | n | Navigate to pane below |
-| `<C-k>` | n | Navigate to pane above |
-| `<C-l>` | n | Navigate to pane right |
-
 ### Debugging (nvim-dap)
 
 #### Highlights

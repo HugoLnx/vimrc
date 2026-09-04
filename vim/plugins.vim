@@ -11,7 +11,6 @@ Plug 'ctrlpvim/ctrlp.vim'
 Plug 'menisadi/kanagawa.vim'
 Plug 'mg979/vim-visual-multi'
 Plug 'dense-analysis/ale'
-Plug 'christoomey/vim-tmux-navigator'
 
 call plug#end()
 
