@@ -85,6 +85,16 @@ return {
       filewatching = 'auto',
       broad_search = false,
     },
+    config = function(_, opts)
+      require('roslyn').setup(opts)
+
+      -- Without --locale, the server defaults to the Windows OS UI language
+      -- (pt-BR on this machine) for hover/diagnostic text. Force English
+      -- regardless of OS locale, matching what VS Code's C# extension does.
+      vim.lsp.config('roslyn', {
+        cmd = { require('roslyn.utils').get_roslyn_lsp_path(), '--stdio', '--locale', 'en-US' },
+      })
+    end,
   },
   {
     -- Keeps a Unity project's .csproj <Compile> entries in sync as .cs
