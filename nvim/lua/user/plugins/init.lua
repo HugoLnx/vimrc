@@ -11,5 +11,6 @@ return {
   require('user.plugins.statusline'),
   require('user.plugins.gitsigns'),
   require('user.plugins.nvim-tree'),
+  require('user.plugins.auto-session'),
   unpack(require('user.plugins.misc')),
 }

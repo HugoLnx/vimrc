@@ -24,6 +24,20 @@
 # csharp_ls LSP integration (Unity/.sln-aware, see nvim/lua/user/unity.lua)
 # in Neovim. Defaults to `true`. Applied by writing
 # nvim/lua/user/local.lua (gitignored, regenerated on every run).
+#
+# Optional top-level field: `allowed_dirs` - restricts auto-session
+# (nvim/lua/user/plugins/auto-session.lua) to only save/restore sessions
+# under these directories. Two OS-keyed lists, since Windows and
+# WSL/Linux use different paths for the same projects; the plugin picks
+# the right list at runtime. Glob patterns (auto-session/Vim glob syntax).
+# IMPORTANT: do NOT use a trailing `/**` (unbounded recursive glob) -
+# auto-session expands every pattern with a blocking, main-thread
+# `vim.fn.expand()` on every save/restore check, and `**` walks the
+# ENTIRE subtree (Library/, Temp/, node_modules/, .git/, ...), which can
+# freeze Neovim for a long time on large project trees. Use single-level
+# `*` segments that match your actual on-disk nesting instead, e.g.
+# `~\projects\*` for one level, `~\archive\*\*` for two levels
+# (category/project). Also baked into nvim/lua/user/local.lua on sync.
 homes:
   - os: linux
     path: "~"
@@ -37,3 +51,11 @@ homes:
 #   - os: windows
 #     path: /mnt/c/Users/hugolnx
 #     unity_yaml_merge: 'C:\Program Files\Unity\Hub\Editor\6000.0.17f1\Editor\Data\Tools\UnityYAMLMerge.exe'
+#
+# Example `allowed_dirs`:
+#
+# allowed_dirs:
+#   windows:
+#     - '~\projects\*'
+#   linux:
+#     - '~/projects/*'
