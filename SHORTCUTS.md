@@ -153,13 +153,14 @@ any attached server (lua_ls, gopls, csharp_ls/roslyn, etc.):
 | `<C-j>` | insert | Next completion item |
 | `<C-k>` | insert | Previous completion item |
 | `<C-h>` | insert | Accept selected item |
+| `<C-\>` | insert | Toggle signature help |
 | `<C-e>` | insert | Cancel/hide menu |
 
 #### All Bindings
 
 Based on the built-in `"default"` preset, with `<C-n>`/`<C-p>`/`<C-y>`
-disabled and `<C-j>`/`<C-k>`/`<C-h>` added in their place
-(`nvim/lua/user/plugins/completion.lua`):
+disabled, `<C-j>`/`<C-k>`/`<C-h>` added in their place, and `show_signature`
+moved off `<C-k>` onto `<C-\>` (`nvim/lua/user/plugins/completion.lua`):
 
 | Key | Mode | Action |
 |---|---|---|
@@ -167,14 +168,11 @@ disabled and `<C-j>`/`<C-k>`/`<C-h>` added in their place
 | `<C-j>` | insert | Next completion item |
 | `<C-k>` | insert | Previous completion item |
 | `<C-h>` | insert | Accept selected item |
+| `<C-\>` | insert | Toggle signature help |
 | `<C-e>` | insert | Cancel/hide menu |
 | `<Tab>` | insert | Snippet forward **(plugin default)** — not "next item" despite this doc previously saying so |
 | `<S-Tab>` | insert | Snippet backward **(plugin default)** |
 | `<C-b>` / `<C-f>` | insert | Scroll signature/doc popup up/down **(plugin default)** |
-
-> **TODO**: the default preset's `<C-k>` was `show_signature` (toggle
-> signature help); reassigning `<C-k>` to "previous completion item" dropped
-> that binding with no replacement key chosen yet.
 
 ### AI Suggestions (Supermaven)
 
