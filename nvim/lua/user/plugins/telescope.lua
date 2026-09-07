@@ -15,6 +15,13 @@ return {
           'tmp/cache/', 'dist/', '_old/', 'vendor/ruby/', 'coverage/',
         },
       },
+      pickers = {
+        -- live_grep/grep_string spawn a new rg process per keystroke;
+        -- Windows' CreateProcess overhead makes that noticeably laggy
+        -- without debouncing.
+        live_grep = { debounce = 50 },
+        grep_string = { debounce = 50 },
+      },
     })
     pcall(telescope.load_extension, 'fzf')
 
