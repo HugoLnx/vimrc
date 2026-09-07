@@ -8,21 +8,52 @@ return {
   },
   config = function()
     local telescope = require('telescope')
+    local make_entry = require('telescope.make_entry')
     local default_ignore_patterns = {
       'node_modules/', '%.git/', 'deps/', '_build/', 'frameworks/',
       'tmp/cache/', 'dist/', '_old/', 'vendor/ruby/', 'coverage/',
     }
     -- project/build metadata and binary/media files: rarely what's wanted
-    -- when jumping to a file to edit, so excluded from the default finder
-    -- (still reachable via the unrestricted <C-S-p> finder below).
-    local non_code_patterns = {
-      '%.meta$', '%.csproj$', '%.sln$', '%.slnx$', '%.user$', '%.suo$',
-      '%.pdb$', '%.dll$', '%.exe$', '%.obj$', '%.cache$',
-      '%.png$', '%.jpg$', '%.jpeg$', '%.gif$', '%.bmp$', '%.ico$', '%.svg$',
-      '%.mp3$', '%.wav$', '%.ogg$', '%.mp4$', '%.mov$',
-      '%.zip$', '%.7z$', '%.rar$', '%.tar$', '%.gz$',
-      '%.ttf$', '%.otf$', '%.woff$', '%.woff2$',
+    -- when jumping to a file to edit, so excluded from the code-only finder
+    -- below via an entry_maker set lookup (still reachable via the
+    -- unrestricted <C-S-p> finder). Kept in sync with repo-configs/gitattributes'
+    -- lfs-file list of binary types.
+    local non_code_extensions = {
+      'meta', 'csproj', 'sln', 'slnx', 'user', 'suo', 'pdb', 'dll', 'exe', 'obj', 'cache',
+      'asset', 'config', 'unity', 'rsp', 'asmdef',
+      -- images
+      'png', 'jpg', 'jpeg', 'gif', 'bmp', 'ico', 'svg', 'svgz', 'psd', 'tga', 'ai', 'apng',
+      'atsc', 'tiff', 'tif', 'iff', 'pict', 'dds', 'xcf', 'leo', 'kra', 'kpp', 'clip',
+      'webm', 'webp', 'afphoto', 'afdesign',
+      -- audio/video
+      'mp3', 'wav', 'ogg', 'aiff', 'aif', 'mod', 'it', 's3m', 'xm',
+      'mp4', 'mov', 'asf', 'mpg', 'mpeg', 'flv', 'ogv', 'wmv', 'mkv',
+      -- archives
+      'zip', '7z', 'rar', 'tar', 'gz', 'dmg',
+      -- fonts
+      'ttf', 'otf', 'woff', 'woff2',
+      -- 3D / unity assets & materials
+      'mat', 'fbx', 'blend', 'blender', 'dae', 'max', 'mb', 'ma', '3ds', 'dfx', 'c4d',
+      'lwo', 'lwo2', 'abc', '3dm', 'glb', 'unitypackage', 'sbsar', 'cubemap', 'bundle',
+      -- binaries / packaging
+      'bin', 'so', 'dylib', 'lib', 'o', 'a', 'pdf', 'sqlite', 'db', 'snk', 'pfx', 'p12',
+      'cer', 'nupkg', 'rns', 'reason', 'lxo',
     }
+    local non_code_ext_set = {}
+    for _, ext in ipairs(non_code_extensions) do
+      non_code_ext_set[ext:lower()] = true
+    end
+    -- Extracts the last dot-suffix of a path's basename, lowercased.
+    -- Returns nil for dotfiles (e.g. .gitignore) and extension-less files.
+    local function file_extension(line)
+      local basename = line:match('[^/\\]+$') or line
+      local ext = basename:match('^.+%.([^.]+)$')
+      return ext and ext:lower() or nil
+    end
+    local function is_non_code_file(line)
+      local ext = file_extension(line)
+      return ext ~= nil and non_code_ext_set[ext] == true
+    end
     telescope.setup({
       defaults = {
         file_ignore_patterns = default_ignore_patterns,
@@ -39,9 +70,15 @@ return {
 
     local builtin = require('telescope.builtin')
     local function find_files_code()
-      builtin.find_files({
-        file_ignore_patterns = vim.list_extend(vim.deepcopy(default_ignore_patterns), non_code_patterns),
-      })
+      local opts = { file_ignore_patterns = default_ignore_patterns }
+      local gen_entry = make_entry.gen_from_file(opts)
+      opts.entry_maker = function(line)
+        if is_non_code_file(line) then
+          return nil
+        end
+        return gen_entry(line)
+      end
+      builtin.find_files(opts)
     end
     -- Under Neovim, ctrlp.vim (classic-Vim-only, see vim/plugins.vim) never
     -- loads - Telescope is the replacement. Keep the muscle-memory shortcut.
