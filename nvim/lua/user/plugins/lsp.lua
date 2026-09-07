@@ -86,14 +86,16 @@ return {
       broad_search = false,
     },
     config = function(_, opts)
+      -- Without forcing English, the server defaults to the Windows OS UI
+      -- language (pt-BR on this machine) for hover/diagnostic text. There's
+      -- no --locale CLI flag (Microsoft.CodeAnalysis.LanguageServer --help
+      -- doesn't list one; passing it makes the server print a usage/help
+      -- block instead of speaking LSP, which breaks rpc.lua entirely), so
+      -- this best-effort forces English via the env vars Roslyn/MSBuild-
+      -- family .NET tooling conventionally read for UI-culture selection.
+      -- Unverified whether this particular server honors them.
+      opts.cmd_env = { DOTNET_CLI_UI_LANGUAGE = 'en-US', VSLANG = '1033' }
       require('roslyn').setup(opts)
-
-      -- Without --locale, the server defaults to the Windows OS UI language
-      -- (pt-BR on this machine) for hover/diagnostic text. Force English
-      -- regardless of OS locale, matching what VS Code's C# extension does.
-      vim.lsp.config('roslyn', {
-        cmd = { require('roslyn.utils').get_roslyn_lsp_path(), '--stdio', '--locale', 'en-US' },
-      })
     end,
   },
   {
