@@ -78,8 +78,14 @@ return {
       defaults = {
         file_ignore_patterns = default_ignore_patterns,
         mappings = {
-          i = { ['<C-t>'] = select_tab_multi },
-          n = { ['<C-t>'] = select_tab_multi },
+          i = {
+            ['<C-t>'] = select_tab_multi,
+            ['<C-z>'] = actions.toggle_selection,
+          },
+          n = {
+            ['<C-t>'] = select_tab_multi,
+            ['<C-z>'] = actions.toggle_selection,
+          },
         },
       },
       pickers = {

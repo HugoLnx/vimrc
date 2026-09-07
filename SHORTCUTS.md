@@ -103,7 +103,9 @@ Inside an open Telescope picker **(plugin default unless noted)**:
 | `<CR>` | insert | Confirm selection |
 | `<C-x>` | insert | Open in horizontal split |
 | `<C-v>` | insert | Open in vertical split |
-| `<C-t>` | insert | Open in new tab; if multiple entries are `<Tab>`-selected, opens each in its own new tab **(customized)** |
+| `<Tab>` / `<S-Tab>` | insert | Toggle multi-select on current entry and move to next/previous |
+| `<C-z>` | insert | Toggle multi-select on current entry, cursor stays put **(customized)** |
+| `<C-t>` | insert | Open in new tab; if multiple entries are multi-selected, opens each in its own new tab **(customized)** |
 | `<Esc>` | insert | Close picker |
 
 ### LSP
