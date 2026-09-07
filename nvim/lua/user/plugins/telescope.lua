@@ -9,6 +9,26 @@ return {
   config = function()
     local telescope = require('telescope')
     local make_entry = require('telescope.make_entry')
+    local actions = require('telescope.actions')
+    local action_state = require('telescope.actions.state')
+    -- <C-t> normally opens only the entry under the cursor in a new tab
+    -- (telescope's actions.set.edit reads get_selected_entry, ignoring
+    -- multi-selection). Open every multi-selected entry in its own tab
+    -- instead, falling back to stock select_tab when nothing is multi-selected.
+    local function select_tab_multi(prompt_bufnr)
+      local picker = action_state.get_current_picker(prompt_bufnr)
+      local selections = picker:get_multi_selection()
+      if #selections == 0 then
+        return actions.select_tab(prompt_bufnr)
+      end
+      actions.close(prompt_bufnr)
+      for _, entry in ipairs(selections) do
+        local filename = entry.path or entry.filename
+        if filename then
+          vim.cmd('tabedit ' .. vim.fn.fnameescape(filename))
+        end
+      end
+    end
     local default_ignore_patterns = {
       'node_modules/', '%.git/', 'deps/', '_build/', 'frameworks/',
       'tmp/cache/', 'dist/', '_old/', 'vendor/ruby/', 'coverage/',
@@ -57,6 +77,10 @@ return {
     telescope.setup({
       defaults = {
         file_ignore_patterns = default_ignore_patterns,
+        mappings = {
+          i = { ['<C-t>'] = select_tab_multi },
+          n = { ['<C-t>'] = select_tab_multi },
+        },
       },
       pickers = {
         -- live_grep/grep_string spawn a new rg process per keystroke;

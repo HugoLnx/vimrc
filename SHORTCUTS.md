@@ -94,7 +94,7 @@ Launch keys (configured in `nvim/lua/user/plugins/telescope.lua`):
 | `<leader>fb` | n | List open buffers |
 | `<leader>fh` | n | Search help tags |
 
-Inside an open Telescope picker **(plugin default)**:
+Inside an open Telescope picker **(plugin default unless noted)**:
 
 | Key | Mode | Action |
 |---|---|---|
@@ -103,7 +103,7 @@ Inside an open Telescope picker **(plugin default)**:
 | `<CR>` | insert | Confirm selection |
 | `<C-x>` | insert | Open in horizontal split |
 | `<C-v>` | insert | Open in vertical split |
-| `<C-t>` | insert | Open in new tab |
+| `<C-t>` | insert | Open in new tab; if multiple entries are `<Tab>`-selected, opens each in its own new tab **(customized)** |
 | `<Esc>` | insert | Close picker |
 
 ### LSP
