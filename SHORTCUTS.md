@@ -87,8 +87,9 @@ Launch keys (configured in `nvim/lua/user/plugins/telescope.lua`):
 
 | Key | Mode | Action |
 |---|---|---|
-| `<C-p>` | n | Find files |
-| `<leader>ff` | n | Find files |
+| `<C-p>` | n | Find files (code/text only; excludes `.meta`, `.csproj`, `.sln`, binaries, media, etc.) |
+| `<leader>ff` | n | Find files (code/text only; same exclusions as `<C-p>`) |
+| `<C-S-p>` | n | Find files (all files, no exclusions) |
 | `<leader>fg` | n | Live grep |
 | `<leader>fb` | n | List open buffers |
 | `<leader>fh` | n | Search help tags |
