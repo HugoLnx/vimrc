@@ -102,7 +102,7 @@ return {
 
     local builtin = require('telescope.builtin')
     local function find_files_code()
-      local opts = { file_ignore_patterns = default_ignore_patterns }
+      local opts = { file_ignore_patterns = default_ignore_patterns, hidden = true }
       local gen_entry = make_entry.gen_from_file(opts)
       opts.entry_maker = function(line)
         if is_non_code_file(line) then
@@ -115,7 +115,8 @@ return {
     -- Under Neovim, ctrlp.vim (classic-Vim-only, see vim/plugins.vim) never
     -- loads - Telescope is the replacement. Keep the muscle-memory shortcut.
     vim.keymap.set('n', '<C-p>', find_files_code, { desc = 'Find files (code/text only)' })
-    vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = 'Find files (all files)' })
+    vim.keymap.set('n', '<leader>ff', function() builtin.find_files({ hidden = true }) end,
+      { desc = 'Find files (all files)' })
     vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = 'Live grep' })
     vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = 'Find buffers' })
     vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = 'Help tags' })
