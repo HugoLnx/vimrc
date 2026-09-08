@@ -1,9 +1,8 @@
 " Classic-Vim-only plugin declarations (vim-plug). Never sourced by Neovim,
 " which manages its own plugins via lazy.nvim (see nvim/lua/user/plugins/).
 
-" WSL-only: vim-tmux-navigator is a no-op without tmux (has('wsl') doesn't
-" exist in classic Vim; detect via the WSL_DISTRO_NAME env var WSL sets).
-let s:is_wsl = !empty($WSL_DISTRO_NAME)
+" Linux only (incl. WSL): vim-tmux-navigator is a no-op without tmux.
+let s:is_linux = has('linux')
 
 if has('win32') || has('win64')
   call plug#begin('~/vimfiles/plugged')
@@ -15,13 +14,13 @@ Plug 'ctrlpvim/ctrlp.vim'
 Plug 'menisadi/kanagawa.vim'
 Plug 'mg979/vim-visual-multi'
 Plug 'dense-analysis/ale'
-if s:is_wsl
+if s:is_linux
   Plug 'christoomey/vim-tmux-navigator'
 endif
 
 call plug#end()
 
-if s:is_wsl
+if s:is_linux
   let g:tmux_navigator_no_mappings = 1
   nnoremap <silent> <C-w>h :TmuxNavigateLeft<cr>
   nnoremap <silent> <C-w>j :TmuxNavigateDown<cr>

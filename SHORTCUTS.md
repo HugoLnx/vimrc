@@ -73,8 +73,8 @@ Reference for every keyboard shortcut available in this repo's Neovim setup
 | `<C-w> h/j/k/l` | n | Move to window left/down/up/right |
 | `gp` / `gP` | n | Paste after/before, leave cursor after pasted text |
 
-> On WSL, `<C-w> h/j/k/l` is overridden by vim-tmux-navigator (see
-> "Window / Pane" under Plugin below) to also cross into tmux panes;
+> On Linux (incl. WSL), `<C-w> h/j/k/l` is overridden by vim-tmux-navigator
+> (see "Window / Pane" under Plugin below) to also cross into tmux panes;
 > elsewhere it's this vanilla built-in.
 
 ---
@@ -88,8 +88,7 @@ Launch keys (configured in `nvim/lua/user/plugins/telescope.lua`):
 | Key | Mode | Action |
 |---|---|---|
 | `<C-p>` | n | Find files (code/text only; excludes `.meta`, `.csproj`, `.sln`, binaries, media, etc.) |
-| `<leader>ff` | n | Find files (code/text only; same exclusions as `<C-p>`) |
-| `<C-S-p>` | n | Find files (all files, no exclusions) |
+| `<leader>ff` | n | Find files (all files, no exclusions) |
 | `<leader>fg` | n | Live grep |
 | `<leader>fb` | n | List open buffers |
 | `<leader>fh` | n | Search help tags |
@@ -101,7 +100,7 @@ Inside an open Telescope picker **(plugin default unless noted)**:
 | `<C-n>` / `<Down>` | insert | Next result |
 | `<C-p>` / `<Up>` | insert | Previous result |
 | `<CR>` | insert | Confirm selection |
-| `<C-x>` | insert | Open in horizontal split |
+| `<C-x>` / `<C-s>` | insert | Open in horizontal split (`<C-s>` **customized**) |
 | `<C-v>` | insert | Open in vertical split |
 | `<Tab>` / `<S-Tab>` | insert | Toggle multi-select on current entry and move to next/previous |
 | `<C-z>` | insert | Toggle multi-select on current entry, cursor stays put **(customized)** |
@@ -150,7 +149,7 @@ Tab/Enter defaults are disabled to avoid clashing with blink.cmp:
 
 | Key | Mode | Action |
 |---|---|---|
-| `<C-y>` | insert | Accept suggestion |
+| `<C-y>` / `<C-S-l>` | insert | Accept suggestion |
 | `<C-l>` | insert | Accept one word of suggestion |
 | `<C-]>` | insert | Clear suggestion |
 
@@ -201,10 +200,10 @@ Everything else is a built-in default **(plugin default)**:
 | `q` | multi-cursor mode | Remove current cursor |
 | `<Esc>` | multi-cursor mode | Exit multi-cursor mode |
 
-### Window / Pane (vim-tmux-navigator, WSL only)
+### Window / Pane (vim-tmux-navigator, Linux only)
 
-Only loaded on WSL (`nvim/lua/user/plugins/misc.lua`) — a no-op without
-tmux, and this repo is otherwise Windows-first. Its own `<C-h/j/k/l>`
+Only loaded on Linux, incl. WSL (`nvim/lua/user/plugins/misc.lua`) — a
+no-op without tmux, and this repo is otherwise Windows-first. Its own `<C-h/j/k/l>`
 defaults are disabled (`g:tmux_navigator_no_mappings = 1`) and remapped
 onto `<C-w> h/j/k/l` to match the vanilla Neovim window-navigation keys
 above, so the same keys cross from a Neovim split into a tmux pane once

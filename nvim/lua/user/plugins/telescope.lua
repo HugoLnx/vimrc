@@ -36,7 +36,7 @@ return {
     -- project/build metadata and binary/media files: rarely what's wanted
     -- when jumping to a file to edit, so excluded from the code-only finder
     -- below via an entry_maker set lookup (still reachable via the
-    -- unrestricted <C-S-p> finder). Kept in sync with repo-configs/gitattributes'
+    -- unrestricted <leader>ff finder). Kept in sync with repo-configs/gitattributes'
     -- lfs-file list of binary types.
     local non_code_extensions = {
       'meta', 'csproj', 'sln', 'slnx', 'user', 'suo', 'pdb', 'dll', 'exe', 'obj', 'cache',
@@ -81,10 +81,12 @@ return {
           i = {
             ['<C-t>'] = select_tab_multi,
             ['<C-z>'] = actions.toggle_selection,
+            ['<C-s>'] = actions.select_horizontal,
           },
           n = {
             ['<C-t>'] = select_tab_multi,
             ['<C-z>'] = actions.toggle_selection,
+            ['<C-s>'] = actions.select_horizontal,
           },
         },
       },
@@ -113,8 +115,7 @@ return {
     -- Under Neovim, ctrlp.vim (classic-Vim-only, see vim/plugins.vim) never
     -- loads - Telescope is the replacement. Keep the muscle-memory shortcut.
     vim.keymap.set('n', '<C-p>', find_files_code, { desc = 'Find files (code/text only)' })
-    vim.keymap.set('n', '<leader>ff', find_files_code, { desc = 'Find files (code/text only)' })
-    vim.keymap.set('n', '<C-S-p>', builtin.find_files, { desc = 'Find files (all files)' })
+    vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = 'Find files (all files)' })
     vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = 'Live grep' })
     vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = 'Find buffers' })
     vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = 'Help tags' })

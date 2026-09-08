@@ -1,4 +1,4 @@
-local is_wsl = vim.fn.has('wsl') == 1
+local is_linux = vim.fn.has('linux') == 1
 
 return {
   {
@@ -11,11 +11,12 @@ return {
     end,
   },
   {
-    -- tmux <-> Neovim pane navigation, WSL only (no-op without tmux
-    -- elsewhere). Its own <C-h/j/k/l> defaults are disabled and remapped
-    -- onto <C-w> h/j/k/l to match vanilla Neovim window navigation.
+    -- tmux <-> Neovim pane navigation, Linux only (incl. WSL; no-op
+    -- without tmux elsewhere). Its own <C-h/j/k/l> defaults are disabled
+    -- and remapped onto <C-w> h/j/k/l to match vanilla Neovim window
+    -- navigation.
     'christoomey/vim-tmux-navigator',
-    cond = function() return is_wsl end,
+    cond = function() return is_linux end,
     init = function()
       vim.g.tmux_navigator_no_mappings = 1
     end,

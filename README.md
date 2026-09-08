@@ -59,7 +59,8 @@ manage LSP/DAP packages.
 - [make](https://www.gnu.org/software/make/) — builds Telescope's optional
   `telescope-fzf-native` perf extension (skipped automatically if absent)
 - [tmux](https://github.com/tmux/tmux/wiki/Installing) — only used by
-  `vim-tmux-navigator`, which is only loaded on WSL; a no-op without it
+  `vim-tmux-navigator`, which is only loaded on Linux (incl. WSL); a
+  no-op without it
 
 **Windows/PowerShell only** (see "Unity / C#" below for how these fit
 together):
@@ -171,12 +172,12 @@ Windows), nvim-dap (debugging, `unity-dap` on Windows), blink.cmp
 (completion), supermaven-nvim (AI inline completions, Neovim-only),
 telescope.nvim (fuzzy finder), lualine.nvim, gitsigns.nvim, kanagawa.nvim,
 plus vim-visual-multi (also usable under Neovim), plus vim-tmux-navigator
-(WSL only).
+(Linux only, incl. WSL).
 Windows additionally gets `apyra/nvim-unity-sync` (keeps a Unity project's
 `.csproj` in sync with files added/renamed/deleted in Neovim).
 
 **Classic Vim** (vim-plug): ctrlp.vim, kanagawa.vim,
-vim-visual-multi, ALE, vim-tmux-navigator (WSL only).
+vim-visual-multi, ALE, vim-tmux-navigator (Linux only, incl. WSL).
 
 Replaced from the old config: Vundle → vim-plug/lazy.nvim (unmaintained),
 syntastic → ALE / native LSP diagnostics (archived by its author),
@@ -292,6 +293,6 @@ installed and working, independent of any specific project:
 - [ ] nvim-dap: a breakpoint can be set and hit for at least one
       configured adapter
 - [ ] vim-visual-multi: multi-cursor editing works
-- [ ] vim-tmux-navigator (WSL only): `<C-w> h/j/k/l` crosses between
+- [ ] vim-tmux-navigator (Linux only, incl. WSL): `<C-w> h/j/k/l` crosses between
       Neovim splits and tmux panes, including from inside a `:terminal`
       buffer
