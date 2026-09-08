@@ -58,11 +58,19 @@ return {
       -- binaries / packaging
       'bin', 'so', 'dylib', 'lib', 'o', 'a', 'pdf', 'sqlite', 'db', 'snk', 'pfx', 'p12',
       'cer', 'nupkg', 'rns', 'reason', 'lxo',
+      -- documentation
+      'md', 'mdc', 'txt', 'rst', 'csv', 'doc', 'docx',
     }
-    local non_code_ext_set = {}
-    for _, ext in ipairs(non_code_extensions) do
-      non_code_ext_set[ext:lower()] = true
+    local function to_set(list)
+      local set = {}
+      for _, item in ipairs(list) do
+        set[item:lower()] = true
+      end
+      return set
     end
+    local non_code_ext_set = to_set(non_code_extensions)
+    -- Extensionless/dotfile basename prefixes excluded from <C-p> alongside non_code_extensions.
+    local non_code_basename_prefixes = { 'readme', 'changelog' }
     -- Extracts the last dot-suffix of a path's basename, lowercased.
     -- Returns nil for dotfiles (e.g. .gitignore) and extension-less files.
     local function file_extension(line)
@@ -70,9 +78,58 @@ return {
       local ext = basename:match('^.+%.([^.]+)$')
       return ext and ext:lower() or nil
     end
+    -- Lowercased basename, used for dotfiles/extensionless names that
+    -- file_extension() can't match (e.g. .gitconfig, README, CHANGELOG).
+    local function file_basename(line)
+      return (line:match('[^/\\]+$') or line):lower()
+    end
+    -- Matches a basename against a list of prefixes, e.g. "dockerfile" matches
+    -- both "dockerfile" and "dockerfile.dev"; ".eslintrc" matches both
+    -- ".eslintrc" and ".eslintrc.js".
+    local function basename_matches(basename, prefixes)
+      for _, prefix in ipairs(prefixes) do
+        if basename == prefix or basename:sub(1, #prefix + 1) == prefix .. '.' then
+          return true
+        end
+      end
+      return false
+    end
     local function is_non_code_file(line)
       local ext = file_extension(line)
-      return ext ~= nil and non_code_ext_set[ext] == true
+      if ext ~= nil and non_code_ext_set[ext] == true then
+        return true
+      end
+      return basename_matches(file_basename(line), non_code_basename_prefixes)
+    end
+    -- Documentation files: <leader>fd finder and (inverted) <C-p> exclusion.
+    local doc_extensions_set = to_set({ 'md', 'mdc', 'txt', 'rst', 'adoc', 'asciidoc', 'org' })
+    local doc_basename_prefixes = {
+      'readme', 'changelog', '.cursorrules', 'license', 'licence', 'contributing',
+      'authors', 'contributors', 'maintainers', 'code_of_conduct', 'notice', 'history',
+      'news', 'todo', '.clinerules', '.windsurfrules',
+    }
+    local function is_doc_file(line)
+      local ext = file_extension(line)
+      if ext ~= nil and doc_extensions_set[ext] == true then
+        return true
+      end
+      return basename_matches(file_basename(line), doc_basename_prefixes)
+    end
+    -- Configuration files: <leader>fc finder.
+    local config_extensions_set = to_set({
+      'cfg', 'yml', 'yaml', 'json', 'config', 'toml', 'conf', 'properties', 'ini',
+    })
+    local config_basename_prefixes = {
+      '.editorconfig', '.gitconfig', '.gitignore', '.gitattributes', '.gitmodules',
+      '.clang-format', '.clang-tidy', '.npmrc', '.nvmrc', '.yarnrc', '.eslintrc',
+      '.prettierrc', '.babelrc', '.dockerignore', 'dockerfile', 'procfile', 'vagrantfile',
+    }
+    local function is_config_file(line)
+      local ext = file_extension(line)
+      if ext ~= nil and config_extensions_set[ext] == true then
+        return true
+      end
+      return basename_matches(file_basename(line), config_basename_prefixes)
     end
     telescope.setup({
       defaults = {
@@ -112,11 +169,29 @@ return {
       end
       builtin.find_files(opts)
     end
+    -- Inclusion-filtered finders: only entries matching the predicate survive.
+    local function find_files_matching(predicate)
+      return function()
+        local opts = { file_ignore_patterns = default_ignore_patterns, hidden = true }
+        local gen_entry = make_entry.gen_from_file(opts)
+        opts.entry_maker = function(line)
+          if not predicate(line) then
+            return nil
+          end
+          return gen_entry(line)
+        end
+        builtin.find_files(opts)
+      end
+    end
+    local find_files_docs = find_files_matching(is_doc_file)
+    local find_files_config = find_files_matching(is_config_file)
     -- Under Neovim, ctrlp.vim (classic-Vim-only, see vim/plugins.vim) never
     -- loads - Telescope is the replacement. Keep the muscle-memory shortcut.
     vim.keymap.set('n', '<C-p>', find_files_code, { desc = 'Find files (code/text only)' })
     vim.keymap.set('n', '<leader>ff', function() builtin.find_files({ hidden = true }) end,
       { desc = 'Find files (all files)' })
+    vim.keymap.set('n', '<leader>fd', find_files_docs, { desc = 'Find documentation files' })
+    vim.keymap.set('n', '<leader>fc', find_files_config, { desc = 'Find configuration files' })
     vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = 'Live grep' })
     vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = 'Find buffers' })
     vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = 'Help tags' })

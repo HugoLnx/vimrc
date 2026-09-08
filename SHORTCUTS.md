@@ -87,8 +87,10 @@ Launch keys (configured in `nvim/lua/user/plugins/telescope.lua`):
 
 | Key | Mode | Action |
 |---|---|---|
-| `<C-p>` | n | Find files (code/text only; includes dotfiles; excludes `.meta`, `.csproj`, `.sln`, binaries, media, `.git/`, etc.) |
+| `<C-p>` | n | Find files (code/text only; includes dotfiles; excludes `.meta`, `.csproj`, `.sln`, binaries, media, documentation (`.md`, `.mdc`, `.txt`, `.rst`, `.csv`, `.doc`, `.docx`, `README`, `CHANGELOG`), `.git/`, etc.) |
 | `<leader>ff` | n | Find files (all files, incl. dotfiles; still excludes `.git/`) |
+| `<leader>fd` | n | Find documentation files only (`.md`, `.mdc`, `.txt`, `.rst`, `.adoc`, `.asciidoc`, `.org`, `README`, `CHANGELOG`, `LICENSE`, `CONTRIBUTING`, `AUTHORS`, `CONTRIBUTORS`, `MAINTAINERS`, `CODE_OF_CONDUCT`, `NOTICE`, `HISTORY`, `NEWS`, `TODO`, `.cursorrules`, `.clinerules`, `.windsurfrules`) |
+| `<leader>fc` | n | Find configuration files only (`.cfg`, `.yml`, `.yaml`, `.json`, `.config`, `.toml`, `.conf`, `.properties`, `.ini`, `.editorconfig`, `.gitconfig`, `.gitignore`, `.gitattributes`, `.gitmodules`, `.clang-format`, `.clang-tidy`, `.npmrc`, `.nvmrc`, `.yarnrc`, `.eslintrc`, `.prettierrc`, `.babelrc`, `.dockerignore`, `Dockerfile`, `Procfile`, `Vagrantfile`; basenames also match with a suffix, e.g. `Dockerfile.dev`, `.eslintrc.js`) |
 | `<leader>fg` | n | Live grep |
 | `<leader>fb` | n | List open buffers |
 | `<leader>fh` | n | Search help tags |
