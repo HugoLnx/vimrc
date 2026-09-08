@@ -17,3 +17,11 @@ require('user.lazy-bootstrap')
 require('lazy').setup(require('user.plugins'), {
   rocks = { enabled = false },
 })
+
+-- The buffer named on the command line gets its FileType event fired
+-- before this file finishes sourcing, so any plugin that hooks FileType to
+-- activate itself (LSP's vim.lsp.enable(), treesitter, roslyn.nvim, ...)
+-- misses it for that first buffer. Re-fire it now that everything's loaded.
+if vim.bo.filetype ~= '' then
+  vim.api.nvim_exec_autocmds('FileType', { buffer = 0 })
+end
