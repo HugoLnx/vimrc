@@ -23,7 +23,19 @@ return {
           local opts = { buffer = args.buf }
           map('n', 'gd', vim.lsp.buf.definition, opts)
           map('n', 'gr', vim.lsp.buf.references, opts)
-          map('n', 'gs', vim.lsp.buf.hover, opts)
+          map('n', 'gs', function()
+            -- Right after opening a large file (e.g. C#), the initial
+            -- treesitter parse/injection pass can still be async in-flight.
+            -- Hover forces a redraw via its floating window, which can race
+            -- that in-progress parse and crash the highlighter's decoration
+            -- provider. Finishing the parse synchronously first closes that
+            -- race window.
+            local ok, parser = pcall(vim.treesitter.get_parser, args.buf)
+            if ok and parser then
+              pcall(function() parser:parse() end)
+            end
+            vim.lsp.buf.hover()
+          end, opts)
           map('n', '<leader>rn', vim.lsp.buf.rename, opts)
           map('n', '<leader>ca', vim.lsp.buf.code_action, opts)
         end,
