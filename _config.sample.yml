@@ -25,6 +25,11 @@
 # Useful for a home you don't want the shared git templates/config on.
 # Same effect as passing --vim-only on the command line, but persistent.
 #
+# Optional per-home field: `only_nvim` - set to `true` to sync only the
+# nvim/ config for that home (no classic Vim files either), skipping
+# repo-configs and gitconfig. Same effect as passing --nvim-only on the
+# command line, but persistent. Mutually exclusive with `only_vim`.
+#
 # Optional top-level field: `csharp_lsp` - set to `false` to disable the
 # csharp_ls LSP integration (Unity/.sln-aware, see nvim/lua/user/unity.lua)
 # in Neovim. Defaults to `true`. Applied by writing

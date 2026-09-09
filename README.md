@@ -133,6 +133,11 @@ for that home, skipping `repo-configs` and `gitconfig` entirely — useful for
 a home you don't want the shared git templates/config on. It has the same
 effect as passing `--vim-only` on the command line, but persists across runs.
 
+Similarly, `only_nvim: true` syncs only the `nvim/` config for that home —
+no classic Vim files (`vim/vimrc`, `vim/syntax/html`) either, and, like
+`only_vim`, no `repo-configs`/`gitconfig`. Same effect as `--nvim-only` on
+the command line. Mutually exclusive with `only_vim`.
+
 `config.yml` also accepts a top-level `csharp_lsp: false` to disable the
 csharp_ls LSP integration (Unity/.sln-aware, see `nvim/lua/user/unity.lua`)
 entirely — useful if you don't do C#/Unity work on a given machine. It
@@ -143,9 +148,11 @@ startup.
 `config.yml` is gitignored (it's machine-specific); re-run
 `python3 install/symlink.py` any time after editing it or pulling changes.
 Useful flags: `--dry-run` (preview only), `--only linux` / `--only
-windows` / `--only mac` (limit to matching `os` entries), and `--vim-only`
+windows` / `--only mac` (limit to matching `os` entries), `--vim-only`
 (sync only vim/nvim config for this run, skipping repo-configs and
-gitconfig — see `only_vim` above for a persistent per-home equivalent). Note
+gitconfig — see `only_vim` above for a persistent per-home equivalent), and
+`--nvim-only` (sync only nvim config for this run, no classic Vim files
+either — see `only_nvim` above; mutually exclusive with `--vim-only`). Note
 that
 symlinking into a `/mnt/c/...` path from WSL depends on Windows/WSL's
 symlink support being enabled — if it's not, `symlink.py` falls back to
