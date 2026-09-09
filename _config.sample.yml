@@ -20,6 +20,11 @@
 # under the installed Unity Editor version's folder), so update it after
 # switching Unity Editor versions.
 #
+# Optional per-home field: `only_vim` - set to `true` to sync only the
+# vim/nvim config for that home, skipping repo-configs and gitconfig.
+# Useful for a home you don't want the shared git templates/config on.
+# Same effect as passing --vim-only on the command line, but persistent.
+#
 # Optional top-level field: `csharp_lsp` - set to `false` to disable the
 # csharp_ls LSP integration (Unity/.sln-aware, see nvim/lua/user/unity.lua)
 # in Neovim. Defaults to `true`. Applied by writing

@@ -18,8 +18,12 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 def layout_for(os_name, home):
-    """Returns {'ensure_dirs': [Path, ...], 'links': [(source_rel, target, copy), ...]}
-    for the given os_name ('linux', 'mac', 'windows') and home root Path."""
+    """Returns {'ensure_dirs': [Path, ...],
+    'links': [(source_rel, target, copy), ...],
+    'extra_links': [(source_rel, target, copy), ...]}
+    for the given os_name ('linux', 'mac', 'windows') and home root Path.
+    'links' is vim/nvim config; 'extra_links' (repo-configs) is skipped
+    when syncing in vim-only mode."""
     if os_name in ('linux', 'mac'):
         return {
             'ensure_dirs': [home / '.vim' / 'backup', home / '.vim' / 'tmp'],
@@ -27,6 +31,8 @@ def layout_for(os_name, home):
                 ('vim/vimrc', home / '.vimrc', False),
                 ('vim/syntax/html', home / '.vim' / 'syntax' / 'html', False),
                 ('nvim', home / '.config' / 'nvim', False),
+            ],
+            'extra_links': [
                 ('repo-configs', home / 'repo-configs', False),
             ],
         }
@@ -45,6 +51,8 @@ def layout_for(os_name, home):
                 ('vim/vimrc', home / 'AppData' / 'Local' / 'vim' / 'vimrc', True),
                 ('vim/syntax/html', home / 'vimfiles' / 'syntax' / 'html', True),
                 ('nvim', home / 'AppData' / 'Local' / 'nvim', True),
+            ],
+            'extra_links': [
                 ('repo-configs', home / 'repo-configs', True),
             ],
         }
@@ -206,7 +214,7 @@ def sync_local_nvim_config(csharp_lsp, dry_run):
     target.write_text(content)
 
 
-def sync_home(entry, dry_run):
+def sync_home(entry, dry_run, vim_only_flag):
     os_name = entry.get('os')
     raw_path = entry.get('path')
     if not os_name or not raw_path:
@@ -214,7 +222,8 @@ def sync_home(entry, dry_run):
         return
 
     home = Path(raw_path).expanduser()
-    print(f"== {os_name}: {home} ==")
+    vim_only = vim_only_flag or bool(entry.get('only_vim'))
+    print(f"== {os_name}: {home} =={' (vim-only)' if vim_only else ''}")
 
     layout = layout_for(os_name, home)
 
@@ -224,11 +233,13 @@ def sync_home(entry, dry_run):
         else:
             d.mkdir(parents=True, exist_ok=True)
 
-    for source_rel, target, copy in layout['links']:
+    links = layout['links'] + ([] if vim_only else layout['extra_links'])
+    for source_rel, target, copy in links:
         source = REPO_ROOT / source_rel
         link_or_copy(source, target, copy, dry_run)
 
-    sync_gitconfig(home / '.gitconfig', entry.get('unity_yaml_merge'), dry_run)
+    if not vim_only:
+        sync_gitconfig(home / '.gitconfig', entry.get('unity_yaml_merge'), dry_run)
 
 
 def main():
@@ -244,6 +255,10 @@ def main():
     parser.add_argument(
         '--only', nargs='+', choices=['linux', 'mac', 'windows'],
         help='only sync homes matching these os values',
+    )
+    parser.add_argument(
+        '--vim-only', action='store_true',
+        help='sync only vim/nvim config for this run, skipping repo-configs and gitconfig',
     )
     args = parser.parse_args()
 
@@ -264,7 +279,7 @@ def main():
         return
 
     for entry in homes:
-        sync_home(entry, args.dry_run)
+        sync_home(entry, args.dry_run, args.vim_only)
 
 
 if __name__ == '__main__':
