@@ -37,8 +37,11 @@ plugins; the external tools below are assumed to already be on PATH.
   [Vim](https://www.vim.org/download.php)
 - [Python 3](https://www.python.org/downloads/) and
   [PyYAML](https://pypi.org/project/PyYAML/) — used by `install/symlink.py`
-- A C compiler — needed to build treesitter parsers (`:TSUpdate`); see
-  [nvim-treesitter's requirements](https://github.com/nvim-treesitter/nvim-treesitter#requirements)
+- A C compiler and the [tree-sitter
+  CLI](https://github.com/tree-sitter/tree-sitter/tree/master/cli)
+  (`npm install -g tree-sitter-cli`) — needed to build treesitter parsers
+  (`:TSUpdate`); see [nvim-treesitter's
+  requirements](https://github.com/nvim-treesitter/nvim-treesitter#requirements)
 - [ripgrep](https://github.com/BurntSushi/ripgrep#installation) — Telescope
   live-grep and ctrlp.vim's grep integration
 - [Go](https://go.dev/doc/install) — `gopls`, installed automatically via
