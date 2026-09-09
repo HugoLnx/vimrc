@@ -14,8 +14,22 @@ require('user.options')
 require('user.keymaps')
 require('user.lazy-bootstrap')
 
+-- Each OS gets its own lockfile: the same nvim/ directory is shared across
+-- every configured home (symlinked on Linux/macOS, copied on Windows - see
+-- install/symlink.py), and plugin commits (and even which plugins load,
+-- e.g. roslyn.nvim vs csharp_ls in user/plugins/lsp.lua) can legitimately
+-- differ per platform, so a single shared lazy-lock.json would have each
+-- OS fighting the others' updates.
+local os_name = 'linux'
+if vim.fn.has('win32') == 1 then
+  os_name = 'windows'
+elseif vim.fn.has('mac') == 1 then
+  os_name = 'mac'
+end
+
 require('lazy').setup(require('user.plugins'), {
   rocks = { enabled = false },
+  lockfile = config_dir .. '/lazy-lock.' .. os_name .. '.json',
 })
 
 -- The buffer named on the command line gets its FileType event fired

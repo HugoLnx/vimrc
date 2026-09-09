@@ -190,6 +190,17 @@ Windows additionally gets `apyra/nvim-unity-sync` (keeps a Unity project's
 **Classic Vim** (vim-plug): ctrlp.vim, kanagawa.vim,
 vim-visual-multi, ALE, vim-tmux-navigator (Linux only, incl. WSL).
 
+lazy.nvim's lockfile is per-OS — `nvim/lazy-lock.linux.json`,
+`.mac.json`, `.windows.json` — instead of the usual single
+`lazy-lock.json`. `nvim/init.lua` picks the right one at startup via
+`vim.fn.has('win32')`/`has('mac')`. This matters because the same `nvim/`
+directory is shared across every configured home (symlinked on Linux/macOS,
+copied on Windows — see `install/symlink.py`), and plugin commits (plus
+which plugins even load, e.g. `roslyn.nvim` vs `csharp_ls` in
+`nvim/lua/user/plugins/lsp.lua`) can legitimately differ per platform; a
+single shared lockfile would have each OS overwriting the others' updates
+on every `git pull` + resync.
+
 Replaced from the old config: Vundle → vim-plug/lazy.nvim (unmaintained),
 syntastic → ALE / native LSP diagnostics (archived by its author),
 vim-multiple-cursors → vim-visual-multi (unmaintained), ctrlp → telescope.nvim
