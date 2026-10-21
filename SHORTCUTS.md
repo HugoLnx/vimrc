@@ -30,6 +30,8 @@ Reference for every keyboard shortcut available in this repo's Neovim setup
 | `K` | n, v | Jump 10 lines up |
 | `[d` | n | Previous diagnostic |
 | `]d` | n | Next diagnostic |
+| `[j` | n | Jump back in jump history (built-in `<C-o>`, which is remapped) |
+| `]j` | n | Jump forward in jump history (built-in `<C-i>`) |
 
 ### Editing
 

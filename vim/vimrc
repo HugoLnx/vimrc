@@ -36,6 +36,9 @@ set belloff=all
 nmap H :tabp<enter>
 nmap L :tabn<enter>
 nmap <c-o> o<esc>
+" jump history back/forward (<C-o> is remapped above; noremap uses the built-in)
+nnoremap [j <C-o>
+nnoremap ]j <C-i>
 map J 10j
 map K 10k
 
