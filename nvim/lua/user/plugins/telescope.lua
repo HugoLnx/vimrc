@@ -141,8 +141,28 @@ return {
       end
       return basename_matches(file_basename(line), config_basename_prefixes)
     end
+    local function path_display(fraction)
+      return function(opts, path)
+        local ok, shortened = pcall(function()
+          local width = math.floor(vim.o.columns * 0.4)
+          local has_width, results_width = pcall(function()
+            local status = require('telescope.state').get_status(vim.api.nvim_get_current_buf())
+            return vim.api.nvim_win_get_width(status.layout.results.winid)
+              - #status.picker.selection_caret - 2 - (opts.__prefix or 0)
+          end)
+          if has_width then width = results_width end
+          -- Reserve room for the devicon and its spacing.
+          width = math.floor((width - 2) * fraction)
+          return require('user.pathshorten').shorten(path, width)
+        end)
+        return ok and shortened or path
+      end
+    end
+    local default_path_display = path_display(1)
+    local grep_path_display = path_display(0.4)
     telescope.setup({
       defaults = {
+        path_display = default_path_display,
         file_ignore_patterns = default_ignore_patterns,
         mappings = {
           i = {
@@ -161,8 +181,8 @@ return {
         -- live_grep/grep_string spawn a new rg process per keystroke;
         -- Windows' CreateProcess overhead makes that noticeably laggy
         -- without debouncing.
-        live_grep = { debounce = 50 },
-        grep_string = { debounce = 50 },
+        live_grep = { debounce = 50, path_display = grep_path_display },
+        grep_string = { debounce = 50, path_display = grep_path_display },
       },
     })
     pcall(telescope.load_extension, 'fzf')
