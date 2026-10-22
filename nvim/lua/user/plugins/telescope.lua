@@ -143,7 +143,7 @@ return {
     end
     local function path_display(fraction)
       return function(opts, path)
-        local ok, shortened = pcall(function()
+        local ok, shortened, style = pcall(function()
           local width = math.floor(vim.o.columns * 0.4)
           local has_width, results_width = pcall(function()
             local status = require('telescope.state').get_status(vim.api.nvim_get_current_buf())
@@ -153,9 +153,16 @@ return {
           if has_width then width = results_width end
           -- Reserve room for the devicon and its spacing.
           width = math.floor((width - 2) * fraction)
-          return require('user.pathshorten').shorten(path, width)
+          local text, marks = require('user.pathshorten').shorten_marked(path, width)
+          local highlight = require('user.pathshorten_highlight')
+          local hints = {}
+          for _, i in ipairs(marks) do
+            hints[#hints + 1] = { { i - 1, i }, highlight.group(text:sub(i, i), 'TelescopePathShorten') }
+          end
+          return text, hints
         end)
-        return ok and shortened or path
+        if not ok then return path end
+        return shortened, style
       end
     end
     local default_path_display = path_display(1)

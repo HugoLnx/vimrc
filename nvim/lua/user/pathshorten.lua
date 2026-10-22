@@ -26,10 +26,36 @@ local function split_words(s)
   return words
 end
 
-local function shorten_words(words, budget)
+-- Shortenings keep a subsequence of each part, described as kept byte ranges.
+local function render(pieces)
+  local out, marks, gap = {}, {}, false
+  local function mark(i)
+    if i > 0 and marks[#marks] ~= i then marks[#marks + 1] = i end
+  end
+  for _, piece in ipairs(pieces) do
+    local str, pos = piece[1], 1
+    for _, range in ipairs(piece[2]) do
+      if range[1] > pos then gap = true end
+      for i = range[1], range[2] do
+        out[#out + 1] = str:sub(i, i)
+        -- Hint the last kept char before a cut, or the first one after a leading cut.
+        if gap then
+          mark(#out > 1 and #out - 1 or 1)
+          gap = false
+        end
+      end
+      pos = math.max(pos, range[2] + 1)
+    end
+    if pos <= #str then gap = true end
+  end
+  if gap then mark(#out) end
+  return table.concat(out), marks
+end
+
+local function word_ranges(words, budget)
   local count, shares, extra = #words, {}, budget
-  if count == 0 or budget <= 0 then return '' end
-  if count == 1 then return words[1]:sub(1, budget) end
+  if count == 0 or budget <= 0 then return {} end
+  if count == 1 then return { { 1, math.min(budget, #words[1]) } } end
   for i = 1, count do shares[i] = 0 end
   local function give(i, amount)
     local add = math.min(amount, #words[i] - shares[i], extra)
@@ -55,34 +81,55 @@ local function shorten_words(words, budget)
     for i = 2, count - 1 do give(i, 1) end
     if extra == before then break end
   end
-  local out = {}
-  for i, word in ipairs(words) do out[i] = word:sub(1, shares[i]) end
-  return table.concat(out)
+  local ranges, pos = {}, 1
+  for i, word in ipairs(words) do
+    if shares[i] > 0 then ranges[#ranges + 1] = { pos, pos + shares[i] - 1 } end
+    pos = pos + #word
+  end
+  return ranges
+end
+
+-- Ranges index into `name .. sep`; the separator is the byte after the name.
+local function folder_ranges(name, budget)
+  local sep = { #name + 1, #name + 1 }
+  if budget <= 0 then return {} end
+  if budget == 1 then return { sep } end
+  if budget < 5 then return { { 1, math.min(budget - 1, #name) }, sep } end
+  if #name + 1 <= budget then return { { 1, #name + 1 } } end
+  local ranges = word_ranges(split_words(name), budget - 1)
+  ranges[#ranges + 1] = sep
+  return ranges
+end
+
+local function base_ranges(base, budget)
+  if budget <= 0 then return {} end
+  if budget < 4 then return { { 1, math.min(budget, #base) } } end
+  if #base <= budget then return { { 1, #base } } end
+  return word_ranges(split_words(base), budget)
+end
+
+local function filename_ranges(filename, budget)
+  if #filename <= budget then return { { 1, #filename } } end
+  local base, ext = filename:match('^(.+)%.([^.]+)$')
+  if not ext then return base_ranges(filename, budget) end
+  if budget <= #ext + 5 then return base_ranges(base, budget) end
+  -- Tight budgets drop the dot before the extension.
+  local dot = budget <= #ext + 8 and 0 or 1
+  local ranges = base_ranges(base, budget - #ext - dot)
+  ranges[#ranges + 1] = { #base + 2 - dot, #filename }
+  return ranges
+end
+
+local function shorten_words(words, budget)
+  return (render({ { table.concat(words), word_ranges(words, budget) } }))
 end
 
 local function shorten_folder(name, budget, sep)
-  sep = sep or '/'
-  if budget <= 0 then return '' end
-  if budget == 1 then return sep end
-  if budget < 5 then return name:sub(1, budget - 1) .. sep end
-  if #name + 1 <= budget then return name .. sep end
-  return shorten_words(split_words(name), budget - 1) .. sep
-end
-
-local function shorten_base(base, budget)
-  if budget <= 0 then return '' end
-  if budget < 4 then return base:sub(1, budget) end
-  if #base <= budget then return base end
-  return shorten_words(split_words(base), budget)
+  return (render({ { name .. (sep or '/'), folder_ranges(name, budget) } }))
 end
 
 local function shorten_filename(filename, budget)
-  if #filename <= budget then return filename end
-  local base, ext = filename:match('^(.+)%.([^.]+)$')
-  if not ext then return shorten_base(filename, budget) end
-  if budget <= #ext + 5 then return shorten_base(base, budget) end
-  if budget <= #ext + 8 then return shorten_base(base, budget - #ext) .. ext end
-  return shorten_base(base, budget - #ext - 1) .. '.' .. ext
+  return (render({ { filename, filename_ranges(filename, budget) } }))
 end
 
 local function clamp_slack(budgets, need)
@@ -219,13 +266,14 @@ local function drop_single_slashes(budgets, need)
   end
 end
 
-function M.shorten(path, target)
-  if target <= 0 then return '' end
-  if #path <= target then return path end
+-- Returns the shortened path and the sorted byte positions of its cut hints.
+function M.shorten_marked(path, target)
+  if target <= 0 then return '', {} end
+  if #path <= target then return path, {} end
   local sep = path:match('[/\\]') or '/'
   local parts, need = {}, {}
   for part in path:gsub('\\', '/'):gmatch('[^/]+') do parts[#parts + 1] = part end
-  if #parts == 0 then return '' end
+  if #parts == 0 then return '', {} end
   local n = #parts - 1
   for i, part in ipairs(parts) do need[i] = #part + (i <= n and 1 or 0) end
   local budgets
@@ -253,10 +301,14 @@ function M.shorten(path, target)
   end
   rebalance(budgets, need)
   drop_single_slashes(budgets, need)
-  local out = {}
-  for i = 1, n do out[i] = shorten_folder(parts[i], budgets[i], sep) end
-  out[n + 1] = shorten_filename(parts[n + 1], budgets[n + 1])
-  return table.concat(out)
+  local pieces = {}
+  for i = 1, n do pieces[i] = { parts[i] .. sep, folder_ranges(parts[i], budgets[i]) } end
+  pieces[n + 1] = { parts[n + 1], filename_ranges(parts[n + 1], budgets[n + 1]) }
+  return render(pieces)
+end
+
+function M.shorten(path, target)
+  return (M.shorten_marked(path, target))
 end
 
 M._split_words = split_words

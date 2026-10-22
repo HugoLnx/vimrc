@@ -78,6 +78,31 @@ local function run()
   -- A full filename and no visible folders leave the freed shares unused.
   equal(shorten.shorten('aaaa/bbbb/x', 3), 'x')
 
+  -- Marked chars render as {c}: the last kept char before each cut.
+  local function marked(path, target)
+    local text, marks = shorten.shorten_marked(path, target)
+    for j = #marks, 1, -1 do
+      local i = marks[j]
+      text = text:sub(1, i - 1) .. '{' .. text:sub(i, i) .. '}' .. text:sub(i + 1)
+    end
+    return text
+  end
+  local mirror = 'DotNetMirroring/Core/Model/Player/IArenaPlayerGPT.cs'
+  equal(marked(mirror, 52), mirror)
+  equal(marked(mirror, 51), 'DotNetMirroring/Core/Mod{e}/Player/IArenaPlayerGPT.cs')
+  equal(marked(mirror, 45), 'DotNetMirr{o}/Co{r}/Mo{d}/Player/IArenaPlayerGPT.cs')
+  equal(marked(mirror, 40), 'DotN{e}Mi{r}/C{o}/M{o}/Player/IArenaPlayerGPT.cs')
+  equal(marked(mirror, 30), 'Do{t}M{i}{/}Play{e}/IArenaPlayerGPT.cs')
+  equal(marked(mirror, 20), 'Do{t}{/}Pl{a}/IA{r}Pl{a}GPT.cs')
+  -- Dropping the extension dot or the whole extension hints the char before it.
+  equal(marked(mirror, 15), 'D{o}{/}P{l}/IA{r}{P}GP{T}cs')
+  equal(marked(mirror, 10), '{D}{/}{P}/IA{r}GP{T}')
+  equal(marked('Assets\\Scripts\\Gameplay\\Arena\\IArenaPlayerCoreGPT.cs', 30),
+    'A{s}{\\}Are{n}\\IArenaPlayerCoreGPT.cs')
+  equal(marked('src/server/handlers/arena_player_core_gpt.py', 20), 'src{/}ha{n}/ar{e}_p{l}_g{p}.py')
+  -- A leading cut hints the first kept char.
+  equal(marked('aaaa/bbbb/x', 3), '{x}')
+
   local seed = 1729
   local function random(limit)
     seed = (seed * 48271) % 2147483647
@@ -99,6 +124,13 @@ local function run()
       local ok, out = pcall(shorten.shorten, path, target)
       assert(ok, string.format('%q at %d: %s', path, target, out))
       assert(#out <= target, string.format('%q at %d produced %q (%d)', path, target, out, #out))
+      local text, marks = shorten.shorten_marked(path, target)
+      equal(text, out)
+      for j, i in ipairs(marks) do
+        assert(i >= 1 and i <= #text and (j == 1 or i > marks[j - 1]),
+          string.format('%q at %d has bad marks for %q', path, target, text))
+      end
+      if #path <= target then equal(#marks, 0) end
       if #path <= target then
         equal(out, path)
       else
