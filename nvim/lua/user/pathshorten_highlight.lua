@@ -1,7 +1,7 @@
 local M = {}
 
--- How far each hint fg moves from its base fg toward the accent fg.
-local HINT_BLEND = 0.35
+-- How far each hint fg moves from its base fg toward DiagnosticError's red.
+local HINT_BLEND = 0.20
 local SLASH_BLEND = 0.75
 
 local function get(name)
@@ -33,11 +33,11 @@ local function define(name, base, accent, amount, with_bg)
 end
 
 function M.setup()
-  define('PathShortenHint', 'TabLine', 'Special', HINT_BLEND, true)
-  define('PathShortenHintSel', 'TabLineSel', 'Special', HINT_BLEND, true)
+  define('PathShortenHint', 'TabLine', 'DiagnosticError', HINT_BLEND, true)
+  define('PathShortenHintSel', 'TabLineSel', 'DiagnosticError', HINT_BLEND, true)
   define('PathShortenSlash', 'TabLine', 'DiagnosticError', SLASH_BLEND, true)
   define('PathShortenSlashSel', 'TabLineSel', 'DiagnosticError', SLASH_BLEND, true)
-  define('TelescopePathShortenHint', 'TelescopeResultsNormal', 'Special', HINT_BLEND, false)
+  define('TelescopePathShortenHint', 'TelescopeResultsNormal', 'DiagnosticError', HINT_BLEND, false)
   define('TelescopePathShortenSlash', 'TelescopeResultsNormal', 'DiagnosticError', SLASH_BLEND, false)
 end
 
