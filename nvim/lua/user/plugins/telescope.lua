@@ -46,11 +46,11 @@ return {
     -- lfs-file list of binary types.
     local non_code_extensions = {
       'meta', 'csproj', 'sln', 'slnx', 'user', 'suo', 'pdb', 'dll', 'exe', 'obj', 'cache',
-      'asset', 'config', 'yaml', 'unity', 'rsp', 'asmdef',
+      'asset', 'config', 'yaml', 'json', 'jsonl', 'targets', 'unity', 'rsp', 'asmdef',
       -- images
       'png', 'jpg', 'jpeg', 'gif', 'bmp', 'ico', 'svg', 'svgz', 'psd', 'tga', 'ai', 'apng',
       'atsc', 'tiff', 'tif', 'iff', 'pict', 'dds', 'xcf', 'leo', 'kra', 'kpp', 'clip',
-      'webm', 'webp', 'afphoto', 'afdesign',
+      'webm', 'webp', 'afphoto', 'afdesign', 'exr',
       -- audio/video
       'mp3', 'wav', 'ogg', 'aiff', 'aif', 'mod', 'it', 's3m', 'xm',
       'mp4', 'mov', 'asf', 'mpg', 'mpeg', 'flv', 'ogv', 'wmv', 'mkv',
@@ -127,7 +127,7 @@ return {
     end
     -- Configuration files: <leader>fc finder.
     local config_extensions_set = to_set({
-      'cfg', 'yml', 'yaml', 'json', 'config', 'toml', 'conf', 'properties', 'ini',
+      'cfg', 'yml', 'yaml', 'json', 'jsonl', 'targets', 'config', 'toml', 'conf', 'properties', 'ini',
     })
     local config_basename_prefixes = {
       '.editorconfig', '.gitconfig', '.gitignore', '.gitattributes', '.gitmodules',
