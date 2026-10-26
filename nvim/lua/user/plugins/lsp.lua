@@ -23,7 +23,11 @@ return {
           local opts = { buffer = args.buf }
           map('n', 'gd', vim.lsp.buf.definition, opts)
           map('n', 'gr', vim.lsp.buf.references, opts)
-          map('n', 'gs', vim.lsp.buf.hover, opts)
+          if vim.bo[args.buf].filetype == 'cs' then
+            map('n', 'gs', function() require('user.hover').hover() end, opts)
+          else
+            map('n', 'gs', vim.lsp.buf.hover, opts)
+          end
           map('n', '<leader>rn', vim.lsp.buf.rename, opts)
           map('n', '<leader>ca', vim.lsp.buf.code_action, opts)
         end,

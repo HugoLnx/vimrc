@@ -120,7 +120,7 @@ any attached server (lua_ls, gopls, csharp_ls/roslyn, etc.):
 |---|---|---|
 | `gd` | n | Go to definition |
 | `gr` | n | List references |
-| `gs` | n | Show hover docs |
+| `gs` | n | Show hover docs (C#: preceded by the full declaration header) |
 | `<leader>rn` | n | Rename symbol |
 | `<leader>ca` | n | Code action |
 
