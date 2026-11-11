@@ -180,8 +180,9 @@ homes:
 
 Use `skip: [labels]` in an entry to omit labels/groups from default (no-label)
 runs. Explicit command-line labels take precedence over `skip`. The old
-`only_vim: true` and `agentic: false` fields still work for one release as
-deprecated aliases for skips; migrate them to `skip`.
+`only_vim: true`, `only_nvim: true` and `agentic: false` fields still work for
+one release as deprecated aliases for skips (`only_nvim` = `skip: [vim, git,
+agentic]`; it is mutually exclusive with `only_vim`); migrate them to `skip`.
 
 `config.yml` also accepts a top-level `csharp_lsp: false` to disable the
 csharp_ls LSP integration (Unity/.sln-aware, see `nvim/lua/user/unity.lua`)
@@ -191,9 +192,9 @@ defaults to `true` and is applied by generating the gitignored
 startup.
 
 `config.yml` is gitignored (it's machine-specific); rerun the appropriate
-installer after editing it or pulling changes. The deprecated `--vim-only`
-and `--agentic-only` flags remain temporarily; use the `vim nvim` and
-`agentic` groups instead. `--only <os>` is no longer supported: the installer
+installer after editing it or pulling changes. The deprecated `--vim-only`,
+`--nvim-only` and `--agentic-only` flags remain temporarily; use the `vim nvim`,
+`nvim` and `agentic` groups instead (e.g. `./install/install.sh nvim`). `--only <os>` is no longer supported: the installer
 always selects its current OS.
 
 | | Linux / macOS | Windows |

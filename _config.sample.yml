@@ -16,7 +16,8 @@
 # adds a [mergetool "unityyamlmerge"] block to this home's .gitconfig.
 #
 # Deprecated per-home fields: `only_vim: true` is treated as `skip: [git,
-# agentic]`; `agentic: false` is treated as `skip: [agentic]`. Migrate to
+# agentic]`; `only_nvim: true` as `skip: [vim, git, agentic]` (mutually
+# exclusive with `only_vim`); `agentic: false` as `skip: [agentic]`. Migrate to
 # `skip`; these compatibility fields will be removed later.
 #
 # Optional top-level field: `csharp_lsp: false` disables csharp_ls integration

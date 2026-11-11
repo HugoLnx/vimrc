@@ -34,14 +34,17 @@ if s:is_linux
   endif
 endif
 
-" Ctrl+P: also show hidden (dotfile) files, but always exclude .git/
+" Ctrl+P: also show hidden (dotfile) files, but always exclude hidden
+" folders (.git/, .vscode/, .claude/, .ai/, ...)
 let g:ctrlp_show_hidden = 1
 set wildignore+=*/node_modules/*,*.so,*.swp,*.pyc,*.jpg,*.png,*.jpeg,*.gif,*.zip,*/deps/*,*/_build/*,*/frameworks/*,*/tmp/cache/*,*/dist/*,*/_old/*,*/vendor/ruby/*,*/coverage/*,*/.git/*
-let g:ctrlp_custom_ignore = 'node_modules/.*,deps/.*,_build/.*,frameworks/.*,tmp/cache/.*,dist/.*,_old/.*,vendor/ruby/.*,coverage/.*,.git/.*'
+let g:ctrlp_custom_ignore = {
+  \ 'dir': '\v[\/](\.[^\/]+|node_modules|deps|_build|frameworks|tmp[\/]cache|dist|_old|vendor[\/]ruby|coverage)$',
+  \ }
 " sudo apt-get install ripgrep
 if executable('rg')
   set grepprg=rg\ --color=never
-  let g:ctrlp_user_command = 'rg %s -i --files --no-heading --hidden --color=never --glob "!.git/"'
+  let g:ctrlp_user_command = 'rg %s -i --files --no-heading --hidden --color=never --glob "!.*/"'
   let g:ctrlp_use_caching = 0
 else
   let g:ctrlp_clear_cache_on_exit = 0

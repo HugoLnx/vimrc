@@ -166,6 +166,28 @@ class EnforceTests(Base):
         self.assertNotIn('agentic-', out)
         self.assertIn('git-config', out)
 
+    def test_nvim_only_flag_and_config(self):
+        code, out, err = self.run_main('--nvim-only', '--dry-run', '--os', 'linux')
+        self.assertEqual(code, 0)
+        self.assertIn('--nvim-only is deprecated', err)
+        for label in ('nvim-config', 'nvim-local', 'nvim-plugins'):
+            self.assertIn(f'-- {label} --', out)
+        for header in ('-- vim-config --', '-- vim-plugins --', '-- git-config --', '-- agentic-'):
+            self.assertNotIn(header, out)
+        code, _, err = self.run_main('--vim-only', '--nvim-only', '--os', 'linux')
+        self.assertEqual(code, 2)
+        self.cfg.write_text('homes:\n  - os: linux\n    path: "~"\n    only_nvim: true\n')
+        _, out, err = self.run_main('--dry-run', '--os', 'linux')
+        self.assertIn('only_nvim', err)
+        self.assertIn('-- nvim-config --', out)
+        for header in ('-- vim-config --', '-- git-config --', '-- agentic-'):
+            self.assertNotIn(header, out)
+        self.cfg.write_text('homes:\n  - os: linux\n    path: "~"\n'
+                            '    only_vim: true\n    only_nvim: true\n')
+        code, _, err = self.run_main('--dry-run', '--os', 'linux')
+        self.assertEqual(code, 2)
+        self.assertIn('mutually exclusive', err)
+
     def test_missing_config_defaults(self):
         code, out, _ = self.run_main('git-config', '--dry-run', '--os', 'linux',
                                      '--config', str(self.root / 'none.yml'), config=False)

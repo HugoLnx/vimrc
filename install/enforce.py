@@ -38,8 +38,11 @@ def build_parser():
                    help='override detected OS (windows|wsl|linux|mac); testing only')
     p.add_argument('--config', type=Path, default=REPO_ROOT / 'config.yml',
                    help='path to config.yml (default: repo root)')
-    p.add_argument('--vim-only', action='store_true',
-                   help='DEPRECATED: same as "vim nvim"')
+    only = p.add_mutually_exclusive_group()
+    only.add_argument('--vim-only', action='store_true',
+                      help='DEPRECATED: same as "vim nvim"')
+    only.add_argument('--nvim-only', action='store_true',
+                      help='DEPRECATED: same as "nvim" (no classic Vim files)')
     p.add_argument('--agentic-only', action='store_true',
                    help='DEPRECATED: same as "agentic"')
     p.add_argument('--only', nargs='*', help=argparse.SUPPRESS)
@@ -69,6 +72,11 @@ def _as_list(v):
 
 def effective_skip(entry):
     skip = _as_list(entry.get('skip'))
+    if entry.get('only_vim') and entry.get('only_nvim'):
+        raise ValueError("config 'only_vim' and 'only_nvim' are mutually exclusive")
+    if entry.get('only_nvim'):
+        _warn("config 'only_nvim' is deprecated; use skip: [vim, git, agentic]")
+        skip += ['vim', 'git', 'agentic']
     if entry.get('only_vim'):
         _warn("config 'only_vim' is deprecated; use skip: [git, agentic]")
         skip += ['git', 'agentic']
@@ -102,6 +110,9 @@ def main(argv=None):
     if args.vim_only:
         _warn("--vim-only is deprecated; use labels: vim nvim")
         labels += ['vim', 'nvim']
+    if args.nvim_only:
+        _warn("--nvim-only is deprecated; use label: nvim")
+        labels.append('nvim')
     if args.agentic_only:
         _warn("--agentic-only is deprecated; use label: agentic")
         labels.append('agentic')
@@ -121,7 +132,10 @@ def main(argv=None):
     home = home_path(entry)
 
     skip = list(args.skip)
-    legacy = effective_skip(entry)
+    try:
+        legacy = effective_skip(entry)
+    except ValueError as e:
+        parser.error(str(e))
     if not labels:
         skip += legacy
 

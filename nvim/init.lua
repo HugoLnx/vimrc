@@ -11,6 +11,7 @@ if vim.fn.filereadable(shared_vimrc) == 1 then
 end
 
 require('user.options')
+require('user.tabline')
 require('user.keymaps')
 require('user.lazy-bootstrap')
 
