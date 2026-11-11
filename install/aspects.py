@@ -45,16 +45,19 @@ def os_family(ctx):
 def layout_for(family, home):
     """Per-label groups: {label: {'ensure_dirs': [Path], 'links': [(src_rel, target, copy)]}}."""
     if family in ('linux', 'mac'):
+        # vim/vimrc (sourced by Neovim too) points backupdir/directory here,
+        # so both editor labels must ensure these dirs exist.
+        editor_dirs = [home / '.vim' / 'backup', home / '.vim' / 'tmp']
         return {
             'vim-config': {
-                'ensure_dirs': [home / '.vim' / 'backup', home / '.vim' / 'tmp'],
+                'ensure_dirs': list(editor_dirs),
                 'links': [
                     ('vim/vimrc', home / '.vimrc', False),
                     ('vim/syntax/html', home / '.vim' / 'syntax' / 'html', False),
                 ],
             },
             'nvim-config': {
-                'ensure_dirs': [],
+                'ensure_dirs': list(editor_dirs),
                 'links': [('nvim', home / '.config' / 'nvim', False)],
             },
             'git-templates': {
@@ -65,9 +68,10 @@ def layout_for(family, home):
     if family == 'windows':
         # copy, not symlink: see history; WSL-created links into a Windows
         # home become Junctions that native apps cannot follow.
+        editor_dirs = [home / 'vimfiles' / 'backup', home / 'vimfiles' / 'tmp']
         return {
             'vim-config': {
-                'ensure_dirs': [home / 'vimfiles' / 'backup', home / 'vimfiles' / 'tmp'],
+                'ensure_dirs': list(editor_dirs),
                 'links': [
                     ('vim/vimrc', home / '_vimrc', True),
                     ('vim/vimrc', home / 'AppData' / 'Local' / 'vim' / 'vimrc', True),
@@ -75,7 +79,7 @@ def layout_for(family, home):
                 ],
             },
             'nvim-config': {
-                'ensure_dirs': [],
+                'ensure_dirs': list(editor_dirs),
                 'links': [('nvim', home / 'AppData' / 'Local' / 'nvim', True)],
             },
             'git-templates': {

@@ -188,6 +188,39 @@ class EnforceTests(Base):
         self.assertEqual(code, 2)
         self.assertIn('mutually exclusive', err)
 
+    def test_nvim_alone_creates_backup_dirs(self):
+        # nvim sources vim/vimrc, which points backupdir/directory at these.
+        self.run_mock.return_value.returncode = 0  # --nvim-only also runs nvim-plugins
+        for argv in (['nvim-config'], ['--nvim-only']):
+            with self.subTest(argv=argv):
+                code, _, _ = self.run_main(*argv, '--os', 'linux')
+                self.assertEqual(code, 0)
+                self.assertTrue((self.home / '.vim' / 'backup').is_dir())
+                self.assertTrue((self.home / '.vim' / 'tmp').is_dir())
+                _, out, _ = self.run_main('nvim-config', '--dry-run', '--os', 'linux')
+                self.assertNotIn('mkdir', out)
+                import shutil
+                shutil.rmtree(self.home / '.vim')
+                (self.home / '.config' / 'nvim').unlink()
+
+    def test_nvim_config_dirs_per_family(self):
+        win = aspects.layout_for('windows', Path('H'))
+        self.assertEqual(win['nvim-config']['ensure_dirs'], win['vim-config']['ensure_dirs'])
+        self.assertTrue(win['nvim-config']['ensure_dirs'])
+        lin = aspects.layout_for('linux', Path('H'))
+        self.assertEqual(lin['nvim-config']['ensure_dirs'], lin['vim-config']['ensure_dirs'])
+
+    def test_conflicting_legacy_fields(self):
+        self.cfg.write_text('homes:\n  - os: linux\n    path: "~"\n'
+                            '    only_vim: true\n    only_nvim: true\n')
+        code, _, err = self.run_main('--dry-run', '--os', 'linux')
+        self.assertEqual(code, 2)
+        self.assertIn('mutually exclusive', err)
+        code, out, err = self.run_main('agentic', '--dry-run', '--os', 'linux')
+        self.assertEqual(code, 0)
+        self.assertIn('mutually exclusive', err)
+        self.assertIn('-- agentic-claude --', out)
+
     def test_missing_config_defaults(self):
         code, out, _ = self.run_main('git-config', '--dry-run', '--os', 'linux',
                                      '--config', str(self.root / 'none.yml'), config=False)

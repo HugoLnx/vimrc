@@ -70,10 +70,16 @@ def _as_list(v):
     return [v] if isinstance(v, str) else list(v)
 
 
-def effective_skip(entry):
+def effective_skip(entry, explicit_labels=False):
+    """Config `skip` plus legacy fields. Conflicting legacy fields are an error
+    only for default runs; explicit CLI labels override skip, so just warn."""
     skip = _as_list(entry.get('skip'))
     if entry.get('only_vim') and entry.get('only_nvim'):
-        raise ValueError("config 'only_vim' and 'only_nvim' are mutually exclusive")
+        msg = "config 'only_vim' and 'only_nvim' are mutually exclusive"
+        if not explicit_labels:
+            raise ValueError(msg)
+        _warn(msg + " (ignored: explicit labels given)")
+        return []
     if entry.get('only_nvim'):
         _warn("config 'only_nvim' is deprecated; use skip: [vim, git, agentic]")
         skip += ['vim', 'git', 'agentic']
@@ -133,7 +139,7 @@ def main(argv=None):
 
     skip = list(args.skip)
     try:
-        legacy = effective_skip(entry)
+        legacy = effective_skip(entry, explicit_labels=bool(labels))
     except ValueError as e:
         parser.error(str(e))
     if not labels:

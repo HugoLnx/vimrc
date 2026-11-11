@@ -183,6 +183,8 @@ runs. Explicit command-line labels take precedence over `skip`. The old
 `only_vim: true`, `only_nvim: true` and `agentic: false` fields still work for
 one release as deprecated aliases for skips (`only_nvim` = `skip: [vim, git,
 agentic]`; it is mutually exclusive with `only_vim`); migrate them to `skip`.
+Note that `nvim` also includes `nvim-plugins` (the lazy.nvim sync); for config
+only, run `./install/install.sh nvim-config nvim-local`.
 
 `config.yml` also accepts a top-level `csharp_lsp: false` to disable the
 csharp_ls LSP integration (Unity/.sln-aware, see `nvim/lua/user/unity.lua`)
