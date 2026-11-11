@@ -34,7 +34,7 @@ return {
       -- Applies to every server mason-lspconfig auto-enables below.
       vim.lsp.config('*', { capabilities = capabilities })
 
-      -- See config.yml's `csharp_lsp` option / install/symlink.py. csharp_ls
+      -- See config.yml's `csharp_lsp` option / install/enforce.py. csharp_ls
       -- also needs the dotnet SDK on PATH to install/run; skip it on
       -- machines that don't have that (e.g. a WSL Linux side used only for
       -- non-Unity work), even if the option itself is left enabled.

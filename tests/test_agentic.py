@@ -92,7 +92,7 @@ class AgenticTests(unittest.TestCase):
         home = self.root / 'linux-home'
         home.mkdir()
         (home / '.zshrc').write_text('# zsh\n')
-        agentic.sync_agentic(home, 'linux', {}, False)
+        self.assertTrue(agentic.sync_agentic(home, 'linux', {}, False))
         self.assertTrue((home / '.claude' / 'statusline.py').is_file())
         self.assertTrue((home / '.claude' / 'agentic' / 'shell' / 'aliases.sh').is_file())
         settings = json.loads((home / '.claude' / 'settings.json').read_text())
@@ -102,20 +102,47 @@ class AgenticTests(unittest.TestCase):
         self.assertIn('aliases.sh', (home / '.zshrc').read_text())
         self.assertFalse((home / '.codex').exists())
         before = (home / '.claude' / 'settings.json').read_text()
-        agentic.sync_agentic(home, 'linux', {}, False)
+        self.assertFalse(agentic.sync_agentic(home, 'linux', {}, False))
         self.assertEqual((home / '.claude' / 'settings.json').read_text(), before)
         self.assertEqual(list((home / '.claude').glob('settings.json_*.bkp')), [])
 
-    def test_sync_windows_with_windows_override(self):
+    def test_sync_windows_derives_path_without_windows_override(self):
         home = self.root / 'windows-home'
         home.mkdir()
-        agentic.sync_agentic(home, 'windows', {'win_path': 'C:\\Users\\Ada'}, False)
+        agentic.sync_agentic(home, 'windows', {}, False)
         settings = json.loads((home / '.claude' / 'settings.json').read_text())
         self.assertEqual(settings['statusLine']['command'],
-                         'python "C:/Users/Ada/.claude/statusline.py"')
+                         f'python "{agentic.to_windows_path(home)}/.claude/statusline.py"')
         profile = home / 'Documents' / 'PowerShell' / 'Microsoft.PowerShell_profile.ps1'
-        self.assertIn('Test-Path "C:/Users/Ada/.claude/agentic/shell/aliases.ps1"', profile.read_text())
+        self.assertIn(
+            f'Test-Path "{agentic.to_windows_path(home)}/.claude/agentic/shell/aliases.ps1"',
+            profile.read_text())
         self.assertTrue((home / '.claude' / 'bin' / 'ralph-loop.cmd').is_file())
+
+    def test_split_syncs_touch_only_their_own_files_and_are_idempotent(self):
+        claude_home = self.root / 'claude-home'
+        claude_home.mkdir()
+        self.assertTrue(agentic.sync_claude(claude_home, 'linux', {}, False))
+        self.assertTrue((claude_home / '.claude' / 'statusline.py').is_file())
+        self.assertTrue((claude_home / '.claude' / 'settings.json').is_file())
+        self.assertFalse((claude_home / '.claude' / 'agentic').exists())
+        self.assertFalse((claude_home / '.bashrc').exists())
+        self.assertFalse(agentic.sync_claude(claude_home, 'linux', {}, False))
+
+        codex_home = self.root / 'codex-home'
+        (codex_home / '.codex').mkdir(parents=True)
+        self.assertTrue(agentic.sync_codex(codex_home, 'linux', {}, False))
+        self.assertTrue((codex_home / '.codex' / 'config.toml').is_file())
+        self.assertFalse((codex_home / '.claude').exists())
+        self.assertFalse(agentic.sync_codex(codex_home, 'linux', {}, False))
+
+        shell_home = self.root / 'shell-home'
+        shell_home.mkdir()
+        self.assertTrue(agentic.sync_shell(shell_home, 'linux', {}, False))
+        self.assertTrue((shell_home / '.claude' / 'agentic' / 'shell' / 'aliases.sh').is_file())
+        self.assertTrue((shell_home / '.bashrc').is_file())
+        self.assertFalse((shell_home / '.claude' / 'statusline.py').exists())
+        self.assertFalse(agentic.sync_shell(shell_home, 'linux', {}, False))
 
     def test_dry_run_touches_nothing(self):
         home = self.root / 'dry-home'

@@ -119,23 +119,31 @@ def upsert_marker_block(file: Path, name: str, body: str, dry_run: bool) -> bool
     return True
 
 
-def _copy_managed(source: Path, target: Path, dry_run: bool) -> None:
-    # Imported lazily so symlink.py can call this module without a cycle.
+def _copy_managed(source: Path, target: Path, dry_run: bool) -> bool:
+    """Copy a managed path and report whether it changed (or would change)."""
+    # Imported lazily while this module is also usable from the old shim.
     try:
-        from symlink import already_copied, backup_if_exists, copy_path
+        from fs import already_copied, backup_if_exists, copy_path
     except ModuleNotFoundError:
-        from .symlink import already_copied, backup_if_exists, copy_path
+        try:
+            from .fs import already_copied, backup_if_exists, copy_path
+        except ImportError:
+            try:
+                from symlink import already_copied, backup_if_exists, copy_path
+            except ModuleNotFoundError:
+                from .symlink import already_copied, backup_if_exists, copy_path
 
     if already_copied(source, target):
         print(f'  up to date: {target}')
-        return
+        return False
     action = f'copy {source} -> {target}'
     if dry_run:
         print(f'  [dry-run] {action}')
-        return
+        return True
     print(f'  {action}')
     backup_if_exists(target)
     copy_path(source, target)
+    return True
 
 
 def _write_result(path: Path, changed: bool, dry_run: bool) -> None:
@@ -147,29 +155,44 @@ def _write_result(path: Path, changed: bool, dry_run: bool) -> None:
         print(f'  write {path}')
 
 
-def sync_agentic(home: Path, os_name: str, entry: dict, dry_run: bool) -> None:
-    """Synchronize agentic configuration for one configured home directory."""
+def sync_claude(home: Path, os_name: str, entry: dict, dry_run: bool) -> bool:
+    """Synchronize Claude's status line and managed settings."""
     claude = home / '.claude'
-    _copy_managed(AGENTIC_SRC / 'claude' / 'statusline.py', claude / 'statusline.py', dry_run)
-    _copy_managed(AGENTIC_SRC / 'shell', claude / 'agentic' / 'shell', dry_run)
+    changed = _copy_managed(
+        AGENTIC_SRC / 'claude' / 'statusline.py', claude / 'statusline.py', dry_run)
 
     managed = json.loads((AGENTIC_SRC / 'claude' / 'settings.managed.json').read_text(encoding='utf-8'))
-    command_home = (entry.get('win_path') or home) if os_name == 'windows' else home
-    command = (f'python "{to_windows_path(command_home)}/.claude/statusline.py"'
+    command = (f'python "{to_windows_path(home)}/.claude/statusline.py"'
                if os_name == 'windows' else f'python3 "{home}/.claude/statusline.py"')
     desired = dict(managed)
     desired['statusLine'] = {'type': 'command', 'command': command, 'padding': 0}
     settings = claude / 'settings.json'
-    _write_result(settings, merge_claude_settings(settings, desired, dry_run), dry_run)
+    settings_changed = merge_claude_settings(settings, desired, dry_run)
+    _write_result(settings, settings_changed, dry_run)
+    return changed or settings_changed
+
+
+def sync_codex(home: Path, os_name: str, entry: dict, dry_run: bool) -> bool:
+    """Synchronize Codex's status line if Codex has been installed."""
+    del os_name, entry
 
     codex = home / '.codex'
     if codex.exists():
         line = (AGENTIC_SRC / 'codex' / 'status_line.txt').read_text(encoding='utf-8').strip()
         target = codex / 'config.toml'
-        _write_result(target, upsert_codex_status_line(target, line, dry_run), dry_run)
+        changed = upsert_codex_status_line(target, line, dry_run)
+        _write_result(target, changed, dry_run)
+        return changed
     else:
         print('  up to date: Codex not installed (no .codex directory)')
+        return False
 
+
+def sync_shell(home: Path, os_name: str, entry: dict, dry_run: bool) -> bool:
+    """Synchronize shell aliases, profiles, and Windows command shims."""
+    del entry
+    claude = home / '.claude'
+    changed = _copy_managed(AGENTIC_SRC / 'shell', claude / 'agentic' / 'shell', dry_run)
     if os_name in ('linux', 'mac'):
         body = (f'[ -f "{home}/.claude/agentic/shell/aliases.sh" ] && '
                 f'. "{home}/.claude/agentic/shell/aliases.sh"')
@@ -178,19 +201,34 @@ def sync_agentic(home: Path, os_name: str, entry: dict, dry_run: bool) -> None:
         if not existing:
             existing = [profiles[0]]
         for profile in existing:
-            _write_result(profile, upsert_marker_block(profile, 'agentic', body, dry_run), dry_run)
+            profile_changed = upsert_marker_block(profile, 'agentic', body, dry_run)
+            _write_result(profile, profile_changed, dry_run)
+            changed = changed or profile_changed
     elif os_name == 'windows':
-        win_home = to_windows_path(entry.get('win_path') or home)
+        win_home = to_windows_path(home)
         body = (f'if (Test-Path "{win_home}/.claude/agentic/shell/aliases.ps1") {{\n'
                 f'    . "{win_home}/.claude/agentic/shell/aliases.ps1"\n}}')
         for profile in (
             home / 'Documents' / 'PowerShell' / 'Microsoft.PowerShell_profile.ps1',
             home / 'Documents' / 'WindowsPowerShell' / 'Microsoft.PowerShell_profile.ps1',
         ):
-            _write_result(profile, upsert_marker_block(profile, 'agentic', body, dry_run), dry_run)
+            profile_changed = upsert_marker_block(profile, 'agentic', body, dry_run)
+            _write_result(profile, profile_changed, dry_run)
+            changed = changed or profile_changed
         bin_dir = claude / 'bin'
-        _copy_managed(AGENTIC_SRC / 'shell' / 'ralph-loop.cmd', bin_dir / 'ralph-loop.cmd', dry_run)
-        _copy_managed(AGENTIC_SRC / 'shell' / 'rloop.cmd', bin_dir / 'rloop.cmd', dry_run)
+        changed = _copy_managed(
+            AGENTIC_SRC / 'shell' / 'ralph-loop.cmd', bin_dir / 'ralph-loop.cmd', dry_run) or changed
+        changed = _copy_managed(
+            AGENTIC_SRC / 'shell' / 'rloop.cmd', bin_dir / 'rloop.cmd', dry_run) or changed
         print(f'  note: add {to_windows_path(bin_dir)} to PATH if it is not already registered')
     else:
         raise ValueError(f"Unknown os '{os_name}' (expected linux, mac, or windows)")
+    return changed
+
+
+def sync_agentic(home: Path, os_name: str, entry: dict, dry_run: bool) -> bool:
+    """Synchronize all managed agentic configuration for one home directory."""
+    claude_changed = sync_claude(home, os_name, entry, dry_run)
+    codex_changed = sync_codex(home, os_name, entry, dry_run)
+    shell_changed = sync_shell(home, os_name, entry, dry_run)
+    return claude_changed or codex_changed or shell_changed

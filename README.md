@@ -14,10 +14,14 @@ nvim/lua/user/        Neovim-only Lua config (options, keymaps, plugins, LSP, Un
 repo-configs/         .gitignore/.gitattributes templates + apply.sh, symlinked to each home
 _config.sample.yml    versioned template for config.yml
 config.yml            your home-directory paths (gitignored, not versioned)
-install/symlink.py    reads config.yml, symlinks this repo's config into each listed home
-install/install.sh    installer for Linux/macOS
-install/install.ps1   installer for Windows (PowerShell)
-install/install.cmd   installer wrapper for Windows (cmd)
+install/enforce.py    label-based, current-OS-only configuration enforcer (the real entry point)
+install/aspects.py    label registry, OS detection, per-label file layouts
+install/fs.py         link/copy/backup helpers shared by the aspects
+install/agentic.py    Claude/Codex/shell sync used by the agentic-* labels
+install/install.sh    thin launcher for Ubuntu/WSL/macOS (forwards args to enforce.py)
+install/install.ps1   thin launcher for Windows PowerShell
+install/install.cmd   thin launcher for Windows cmd (calls install.ps1)
+install/symlink.py    deprecated shim that forwards to enforce.py
 install/windows_env.ps1  Windows env setup for the agentic tooling (pwsh, env var, PATH)
 agentic/              Claude/Codex status line + ralph-loop shell helpers
 ```
@@ -29,8 +33,8 @@ Vim uses vim-plug (`vim/plugins.vim`), Neovim uses lazy.nvim
 
 ## Dependencies
 
-This repo's installer only symlinks config files and installs editor
-plugins; the external tools below are assumed to already be on PATH.
+This repo's installer enforces config files (symlinks/copies/merges) and
+installs editor plugins; the external tools below are assumed to already be on PATH.
 
 **Both platforms:**
 
@@ -39,7 +43,7 @@ plugins; the external tools below are assumed to already be on PATH.
   `roslyn.nvim` needs ≥0.12 — plus, optionally, classic
   [Vim](https://www.vim.org/download.php)
 - [Python 3](https://www.python.org/downloads/) and
-  [PyYAML](https://pypi.org/project/PyYAML/) — used by `install/symlink.py`
+  [PyYAML](https://pypi.org/project/PyYAML/) — used by `install/enforce.py`
 - A C compiler and the [tree-sitter
   CLI](https://github.com/tree-sitter/tree-sitter/tree/master/cli)
   (`npm install -g tree-sitter-cli`) — needed to build treesitter parsers
@@ -80,7 +84,7 @@ together):
 ## Install
 
 ```sh
-# Linux / macOS
+# Ubuntu / WSL / macOS
 ./install/install.sh
 ```
 
@@ -89,10 +93,57 @@ together):
 ./install/install.ps1
 ```
 
-Both installers back up any existing config (timestamped), then symlink this
-repo's files into place so `git pull` updates apply immediately without
-re-running the installer. `gitconfig` is copied instead of symlinked, since
-it commonly picks up machine-local edits.
+The installer is label-based. With no labels it enforces every label valid for
+the current OS. It backs up existing managed files when needed; `gitconfig` is
+copied rather than symlinked because it commonly acquires machine-local edits.
+
+| Label | Enforces |
+|---|---|
+| `vim-config` | vimrc, Vim backup/tmp directories, and classic Vim syntax files |
+| `vim-plugins` | vim-plug download and `vim +PlugInstall` |
+| `nvim-config` | the Neovim configuration directory |
+| `nvim-local` | generated `nvim/lua/user/local.lua` from `csharp_lsp` |
+| `nvim-plugins` | `Lazy! sync` with the OS-specific lockfile |
+| `git-config` | `.gitconfig`, including optional UnityYAMLMerge setup |
+| `git-templates` | `repo-configs/` templates |
+| `agentic-claude` | Claude status line and managed settings merge |
+| `agentic-codex` | Codex status line (when Codex is installed) |
+| `agentic-shell` | shell aliases/profiles and Windows cmd shims |
+| `win-env` | Windows PowerShell environment setup |
+
+Groups expand to their prefix: `vim`, `nvim`, `git`, `agentic`, and `win`.
+`all` selects everything applicable to the current OS.
+
+```powershell
+# Windows PowerShell
+.\install\install.ps1 -Labels agentic -DryRun
+```
+
+```bat
+:: Windows cmd
+install\install.cmd -Labels agentic
+```
+
+```sh
+# Ubuntu / WSL / macOS
+./install/install.sh agentic-codex --dry-run
+```
+
+The shared flags are `--skip LABEL ...`, `--dry-run`, `--check`, and
+`--list`. PowerShell spells them as `-Skip`, `-DryRun`, `-Check`, and `-List`.
+`--check` performs no changes and exits nonzero when configuration has drift.
+
+There are deliberately no `vim-shortcuts` or `nvim-shortcuts` labels:
+shortcuts live in `vim/vimrc` and `nvim/lua/user/keymaps.lua` and are enforced
+with `vim-config` and `nvim-config` respectively.
+
+`--list` prints every label, whether it applies on the detected OS (`windows`,
+`wsl`, `linux` or `mac`) and what the current selection resolves to. Labels that
+don't apply (e.g. `win-env` outside Windows) are skipped with a notice.
+
+Only the current OS is configured, and only the `config.yml` home matching it
+is used. WSL counts as Linux. This is a breaking change: WSL no longer syncs a
+Windows home; run the PowerShell (or cmd) installer on Windows for that side.
 
 On Windows, creating symlinks requires Developer Mode or an elevated
 PowerShell session; if that's not available the installer falls back to
@@ -100,12 +151,9 @@ copying the files (and you'll need to re-run it after future `git pull`s).
 
 ### config.yml
 
-The actual linking work is config-driven: `install.sh`/`install.ps1` create
-`config.yml` from `_config.sample.yml` on first run (one entry for your
-native home) and then call `install/symlink.py`, which reads `config.yml`'s
-`homes` list and creates every link. `config.yml` only says *where* each
-home directory is — `symlink.py` decides which files/subfolders get linked
-under it, based on each entry's `os`.
+`install.sh`/`install.ps1` create `config.yml` on first run. Its `homes` list
+can contain entries for several OSes, but a run uses only the entry matching
+its current OS; if there is none, it uses `~`.
 
 ```yaml
 homes:
@@ -113,28 +161,27 @@ homes:
     path: "~"
 ```
 
-If you're on WSL, you can list both your Linux home and your Windows home
-(reachable at `/mnt/c/Users/<you>`) and one run keeps both in sync. A home
-entry can also set `unity_yaml_merge` to the path of `UnityYAMLMerge.exe`
+An entry can set `unity_yaml_merge` to the path of `UnityYAMLMerge.exe`
 (bundled with each Unity Editor install), which adds a
 `[mergetool "unityyamlmerge"]` block to that home's `.gitconfig` so `git
 mergetool` can resolve Unity scene/prefab conflicts. It's per-home and
 optional because the path is version-specific and only makes sense where
-Unity is actually installed:
+Unity is actually installed. A multi-OS file like this is fine: each run only
+reads the entry for the OS it runs on:
 
 ```yaml
 homes:
   - os: linux
-    path: /home/hugolnx
+    path: "~"
   - os: windows
-    path: /mnt/c/Users/hugolnx
+    path: "~"
     unity_yaml_merge: 'C:\Program Files\Unity\Hub\Editor\6000.0.17f1\Editor\Data\Tools\UnityYAMLMerge.exe'
 ```
 
-A home entry can also set `only_vim: true` to sync only the vim/nvim config
-for that home, skipping `repo-configs` and `gitconfig` entirely — useful for
-a home you don't want the shared git templates/config on. It has the same
-effect as passing `--vim-only` on the command line, but persists across runs.
+Use `skip: [labels]` in an entry to omit labels/groups from default (no-label)
+runs. Explicit command-line labels take precedence over `skip`. The old
+`only_vim: true` and `agentic: false` fields still work for one release as
+deprecated aliases for skips; migrate them to `skip`.
 
 `config.yml` also accepts a top-level `csharp_lsp: false` to disable the
 csharp_ls LSP integration (Unity/.sln-aware, see `nvim/lua/user/unity.lua`)
@@ -143,16 +190,11 @@ defaults to `true` and is applied by generating the gitignored
 `nvim/lua/user/local.lua`, which `nvim/lua/user/plugins/lsp.lua` reads at
 startup.
 
-`config.yml` is gitignored (it's machine-specific); re-run
-`python3 install/symlink.py` any time after editing it or pulling changes.
-Useful flags: `--dry-run` (preview only), `--only linux` / `--only
-windows` / `--only mac` (limit to matching `os` entries), and `--vim-only`
-(sync only vim/nvim config for this run, skipping repo-configs and
-gitconfig — see `only_vim` above for a persistent per-home equivalent). Note
-that
-symlinking into a `/mnt/c/...` path from WSL depends on Windows/WSL's
-symlink support being enabled — if it's not, `symlink.py` falls back to
-copying, same as the native-Windows fallback.
+`config.yml` is gitignored (it's machine-specific); rerun the appropriate
+installer after editing it or pulling changes. The deprecated `--vim-only`
+and `--agentic-only` flags remain temporarily; use the `vim nvim` and
+`agentic` groups instead. `--only <os>` is no longer supported: the installer
+always selects its current OS.
 
 | | Linux / macOS | Windows |
 |---|---|---|
@@ -163,9 +205,9 @@ copying, same as the native-Windows fallback.
 
 ## Agentic (Claude/Codex) setup
 
-The installer also sets up the Claude Code / Codex CLI "agentic" tooling in
-each configured home (skip with `agentic: false` per home, `--vim-only`, or
-sync only this with `--agentic-only`; see `_config.sample.yml`).
+Select the `agentic` group (or one of `agentic-claude`, `agentic-codex`, and
+`agentic-shell`) to set up the Claude Code / Codex CLI tooling. `win-env` is
+a separate Windows-only label.
 
 What gets installed:
 
@@ -182,13 +224,6 @@ What gets installed:
   winget if `pwsh` is missing, user env var
   `CLAUDE_CODE_USE_POWERSHELL_TOOL=1`, and `<home>\.claude\bin` added to the
   user `PATH`. Open a new terminal afterwards.
-
-| Environment | Run |
-|---|---|
-| Windows / PowerShell | `install\install.ps1` |
-| Windows / cmd | `install\install.cmd` |
-| Ubuntu | `install/install.sh` |
-| WSL | `install/install.sh` with both the Linux and Windows homes in `config.yml` (also runs `windows_env.ps1` on the Windows side through WSL interop; if interop is unavailable it prints a notice, run `install\install.ps1` on Windows instead) |
 
 **Tuning the status line:** edit the `CFG` block at the top of
 `agentic/claude/statusline.py` and re-run the installer. To test it with a
@@ -208,7 +243,7 @@ when piping a sample JSON payload into it.
 ## repo-configs
 
 `repo-configs/gitignore` and `repo-configs/gitattributes` are templates you
-can drop into any repository. The installer symlinks `repo-configs/` into
+can drop into any repository. The `git-templates` label symlinks (copies, on Windows) `repo-configs/` into
 each configured home directory (as `~/repo-configs`, or
 `$env:USERPROFILE\repo-configs` on Windows), so it's reachable from anywhere.
 To apply the templates to the repository you're currently in:
@@ -242,7 +277,7 @@ lazy.nvim's lockfile is per-OS — `nvim/lazy-lock.linux.json`,
 `lazy-lock.json`. `nvim/init.lua` picks the right one at startup via
 `vim.fn.has('win32')`/`has('mac')`. This matters because the same `nvim/`
 directory is shared across every configured home (symlinked on Linux/macOS,
-copied on Windows — see `install/symlink.py`), and plugin commits (plus
+copied on Windows — see `install/enforce.py`), and plugin commits (plus
 which plugins even load, e.g. `roslyn.nvim` vs `csharp_ls` in
 `nvim/lua/user/plugins/lsp.lua`) can legitimately differ per platform; a
 single shared lockfile would have each OS overwriting the others' updates

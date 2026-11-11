@@ -1,4 +1,12 @@
 #Requires -Version 5.1
+param(
+    [string[]]$Labels = @(),
+    [string[]]$Skip = @(),
+    [switch]$DryRun,
+    [switch]$Check,
+    [switch]$List
+)
+
 $ErrorActionPreference = 'Stop'
 
 $repoDir = Split-Path -Parent $PSScriptRoot
@@ -11,7 +19,7 @@ homes:
   - os: windows
     path: "~"
 "@ | Set-Content -Path $configPath
-    Write-Host "Edit $configPath if you want to sync other homes (e.g. a WSL Linux home)."
+    Write-Host "Edit $configPath to customize labels or your current OS home."
 }
 
 $python = Get-Command python3 -ErrorAction SilentlyContinue
@@ -21,29 +29,18 @@ if (-not $python) {
     exit 1
 }
 
-Write-Host '== Symlinking config =='
-& $python.Source (Join-Path $repoDir 'install\symlink.py')
-
-Write-Host '== Windows environment (agentic) =='
-try {
-    & (Join-Path $PSScriptRoot 'windows_env.ps1')
-} catch {
-    Write-Warning "windows_env.ps1 failed: $_"
+& $python.Source -c 'import yaml'
+if ($LASTEXITCODE -ne 0) {
+    Write-Error 'PyYAML is required. Install it with: python -m pip install PyYAML'
+    exit 1
 }
 
-Write-Host '== vim-plug =='
-New-Item -ItemType Directory -Force -Path "$HOME\vimfiles\autoload" | Out-Null
-Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim' `
-    -OutFile "$HOME\vimfiles\autoload\plug.vim"
+$argv = @()
+$argv += $Labels
+if ($Skip.Count -gt 0) { $argv += '--skip'; $argv += $Skip }
+if ($DryRun) { $argv += '--dry-run' }
+if ($Check) { $argv += '--check' }
+if ($List) { $argv += '--list' }
 
-if (Get-Command vim -ErrorAction SilentlyContinue) {
-    Write-Host '== Installing classic Vim plugins =='
-    vim +PlugInstall +qall
-}
-
-if (Get-Command nvim -ErrorAction SilentlyContinue) {
-    Write-Host '== Installing Neovim plugins =='
-    nvim --headless "+Lazy! sync" +qa
-}
-
-Write-Host 'Done.'
+& $python.Source (Join-Path $repoDir 'install\enforce.py') @argv
+exit $LASTEXITCODE

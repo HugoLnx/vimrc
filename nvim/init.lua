@@ -16,7 +16,7 @@ require('user.lazy-bootstrap')
 
 -- Each OS gets its own lockfile: the same nvim/ directory is shared across
 -- every configured home (symlinked on Linux/macOS, copied on Windows - see
--- install/symlink.py), and plugin commits (and even which plugins load,
+-- install/enforce.py), and plugin commits (and even which plugins load,
 -- e.g. roslyn.nvim vs csharp_ls in user/plugins/lsp.lua) can legitimately
 -- differ per platform, so a single shared lazy-lock.json would have each
 -- OS fighting the others' updates.

@@ -1,56 +1,40 @@
 # Copy this file to config.yml (install.sh/install.ps1 do this for you
-# automatically if config.yml doesn't exist yet) and edit it to list the
-# home directories you want this repo's vim/nvim config symlinked into.
+# automatically if config.yml does not exist yet).
 #
-# One entry per home directory. `os` is one of: linux, windows, mac.
-# The symlink script (install/symlink.py) decides the exact files/
-# subfolders to link under each home based on its `os` value - this file
-# only says *where* those homes are.
+# The enforcer uses only the home entry matching the OS it currently runs on:
+# linux (including WSL), mac, or windows. Other entries are ignored. If no
+# entry matches, the current user's home (~) is used.
 #
-# If you're on WSL, you can list both your Linux home and your Windows
-# home (reachable at /mnt/c/Users/<you>) here, and one run of the symlink
-# script keeps both in sync.
+# Optional per-home field: `skip` is a list of labels/groups to leave out of
+# a default run (one with no labels on the command line). For example:
+#   skip: [vim-plugins, agentic]
+# Explicit CLI labels always win, so `./install/install.sh agentic` still
+# runs the agentic labels when this list includes `agentic`.
 #
-# Optional per-home field: `unity_yaml_merge` - the full path to
-# UnityYAMLMerge (bundled with each Unity Editor install, under
-# Editor/Data/Tools/). If set, the symlink script appends a
-# [mergetool "unityyamlmerge"] block to that home's .gitconfig, so `git
-# mergetool` can resolve Unity scene/prefab YAML conflicts. Left unset,
-# no mergetool block is added. The path is version-specific (it lives
-# under the installed Unity Editor version's folder), so update it after
-# switching Unity Editor versions.
+# Optional per-home field: `unity_yaml_merge` is the full path to
+# UnityYAMLMerge (under an installed Unity Editor's Editor/Data/Tools/). It
+# adds a [mergetool "unityyamlmerge"] block to this home's .gitconfig.
 #
-# Optional per-home field: `only_vim` - set to `true` to sync only the
-# vim/nvim config for that home, skipping repo-configs and gitconfig.
-# Useful for a home you don't want the shared git templates/config on.
-# Same effect as passing --vim-only on the command line, but persistent.
+# Deprecated per-home fields: `only_vim: true` is treated as `skip: [git,
+# agentic]`; `agentic: false` is treated as `skip: [agentic]`. Migrate to
+# `skip`; these compatibility fields will be removed later.
 #
-# Optional per-home field: `agentic` - `true`/`false` to install (or skip) the
-# Claude/Codex "agentic" setup for that home (status line, ralph-loop/rloop
-# shell helpers, settings merge; see README "Agentic (Claude/Codex) setup").
-# Defaults to `true`, unless the home has `only_vim: true`. `--vim-only`
-# skips agentic entirely; `--agentic-only` syncs only the agentic setup.
-#
-# Optional per-home field: `win_path` - for `os: windows` homes, an explicit
-# Windows-style path (e.g. 'C:\Users\hugolnx') overriding the one derived
-# from `path`. Useful when `path` is a WSL mount (/mnt/c/...) that can't be
-# translated automatically.
-#
-# Optional top-level field: `csharp_lsp` - set to `false` to disable the
-# csharp_ls LSP integration (Unity/.sln-aware, see nvim/lua/user/unity.lua)
-# in Neovim. Defaults to `true`. Applied by writing
-# nvim/lua/user/local.lua (gitignored, regenerated on every run).
-#
+# Optional top-level field: `csharp_lsp: false` disables csharp_ls integration
+# in Neovim. It defaults to true and controls generated nvim/lua/user/local.lua.
+
 homes:
   - os: linux
     path: "~"
 
-# Example WSL setup with both a Linux and a Windows home, and Unity
-# installed on the Windows side:
-#
+# A multi-OS config can be committed locally, but each run affects only its
+# own OS. Run install/install.ps1 on Windows rather than syncing a Windows
+# home through WSL.
 # homes:
 #   - os: linux
-#     path: /home/hugolnx
+#     path: /home/you
 #   - os: windows
-#     path: /mnt/c/Users/hugolnx
+#     path: "~"
 #     unity_yaml_merge: 'C:\Program Files\Unity\Hub\Editor\6000.0.17f1\Editor\Data\Tools\UnityYAMLMerge.exe'
+#     skip: [nvim-plugins]
+
+# csharp_lsp: false
