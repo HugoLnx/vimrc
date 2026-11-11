@@ -25,6 +25,17 @@
 # Useful for a home you don't want the shared git templates/config on.
 # Same effect as passing --vim-only on the command line, but persistent.
 #
+# Optional per-home field: `agentic` - `true`/`false` to install (or skip) the
+# Claude/Codex "agentic" setup for that home (status line, ralph-loop/rloop
+# shell helpers, settings merge; see README "Agentic (Claude/Codex) setup").
+# Defaults to `true`, unless the home has `only_vim: true`. `--vim-only`
+# skips agentic entirely; `--agentic-only` syncs only the agentic setup.
+#
+# Optional per-home field: `win_path` - for `os: windows` homes, an explicit
+# Windows-style path (e.g. 'C:\Users\hugolnx') overriding the one derived
+# from `path`. Useful when `path` is a WSL mount (/mnt/c/...) that can't be
+# translated automatically.
+#
 # Optional top-level field: `csharp_lsp` - set to `false` to disable the
 # csharp_ls LSP integration (Unity/.sln-aware, see nvim/lua/user/unity.lua)
 # in Neovim. Defaults to `true`. Applied by writing

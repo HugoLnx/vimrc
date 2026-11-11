@@ -17,6 +17,9 @@ config.yml            your home-directory paths (gitignored, not versioned)
 install/symlink.py    reads config.yml, symlinks this repo's config into each listed home
 install/install.sh    installer for Linux/macOS
 install/install.ps1   installer for Windows (PowerShell)
+install/install.cmd   installer wrapper for Windows (cmd)
+install/windows_env.ps1  Windows env setup for the agentic tooling (pwsh, env var, PATH)
+agentic/              Claude/Codex status line + ralph-loop shell helpers
 ```
 
 `vim/vimrc` never references Lua or a plugin manager, so it's safe to source
@@ -157,6 +160,50 @@ copying, same as the native-Windows fallback.
 | classic Vim runtime dir | `~/.vim/` | `$env:USERPROFILE\vimfiles\` |
 | Neovim config | `~/.config/nvim/init.lua` | `$env:LOCALAPPDATA\nvim\init.lua` |
 | Neovim data (plugins) | `~/.local/share/nvim/` | `$env:LOCALAPPDATA\nvim-data\` |
+
+## Agentic (Claude/Codex) setup
+
+The installer also sets up the Claude Code / Codex CLI "agentic" tooling in
+each configured home (skip with `agentic: false` per home, `--vim-only`, or
+sync only this with `--agentic-only`; see `_config.sample.yml`).
+
+What gets installed:
+
+- `agentic/claude/statusline.py` → `<home>/.claude/statusline.py`, wired
+  into Claude Code's `settings.json`.
+- Claude `settings.json` keys merged (other keys untouched): `model`,
+  `effortLevel`, `statusLine`.
+- Codex `config.toml`: `[tui] status_line` set.
+- `ralph-loop` / `rloop` for each shell, from `agentic/shell/` (copied to
+  `<home>/.claude/agentic/shell/` and sourced from a marked block in your
+  shell profile): `aliases.sh` for bash/zsh, `aliases.ps1` for PowerShell,
+  `ralph-loop.cmd`/`rloop.cmd` copied to `<home>/.claude/bin/` for cmd.
+- Windows only (`install/windows_env.ps1`, idempotent): PowerShell 7 via
+  winget if `pwsh` is missing, user env var
+  `CLAUDE_CODE_USE_POWERSHELL_TOOL=1`, and `<home>\.claude\bin` added to the
+  user `PATH`. Open a new terminal afterwards.
+
+| Environment | Run |
+|---|---|
+| Windows / PowerShell | `install\install.ps1` |
+| Windows / cmd | `install\install.cmd` |
+| Ubuntu | `install/install.sh` |
+| WSL | `install/install.sh` with both the Linux and Windows homes in `config.yml` (also runs `windows_env.ps1` on the Windows side through WSL interop; if interop is unavailable it prints a notice, run `install\install.ps1` on Windows instead) |
+
+**Tuning the status line:** edit the `CFG` block at the top of
+`agentic/claude/statusline.py` and re-run the installer. To test it with a
+fixed clock, set `STATUSLINE_NOW` (epoch seconds)
+when piping a sample JSON payload into it.
+
+**Limitations:**
+
+- Rate-limit segments only appear for Pro/Max logins, and only after the
+  first response in a session.
+- Codex's footer accepts only its built-in status-line items, so it is not
+  as customizable as Claude's.
+- `ralph-loop` needs the skill at
+  `~/.ai/skills/gl-lnx-spec-driven-development` (it prints an error and
+  exits 1 if the script is missing).
 
 ## repo-configs
 

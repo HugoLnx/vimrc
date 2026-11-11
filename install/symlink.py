@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Symlinks this repo's vim/nvim config into the home directories listed in
-config.yml. See _config.sample.yml for the config schema.
+"""Syncs this repo's vim/nvim config and optional agentic setup into homes
+listed in config.yml. See _config.sample.yml for the config schema.
 
-config.yml only says *where* each home directory is (per OS); the mapping
-of which files/subfolders get linked under each home lives here, in
-LAYOUTS below - not in the config file.
+The config supplies home paths and per-home options. The mapping of vim/nvim
+files/subfolders linked under each home lives here in LAYOUTS; this script also
+installs the opt-out agentic setup unless vim-only mode is selected.
 """
 
 import argparse
@@ -214,7 +214,7 @@ def sync_local_nvim_config(csharp_lsp, dry_run):
     target.write_text(content)
 
 
-def sync_home(entry, dry_run, vim_only_flag):
+def sync_home(entry, dry_run, vim_only_flag, agentic_only_flag=False):
     os_name = entry.get('os')
     raw_path = entry.get('path')
     if not os_name or not raw_path:
@@ -223,7 +223,14 @@ def sync_home(entry, dry_run, vim_only_flag):
 
     home = Path(raw_path).expanduser()
     vim_only = vim_only_flag or bool(entry.get('only_vim'))
-    print(f"== {os_name}: {home} =={' (vim-only)' if vim_only else ''}")
+    mode = ' (agentic-only)' if agentic_only_flag else (' (vim-only)' if vim_only else '')
+    print(f"== {os_name}: {home} =={mode}")
+
+    if agentic_only_flag:
+        if entry.get('agentic', True):
+            from agentic import sync_agentic
+            sync_agentic(home, os_name, entry, dry_run)
+        return
 
     layout = layout_for(os_name, home)
 
@@ -240,6 +247,9 @@ def sync_home(entry, dry_run, vim_only_flag):
 
     if not vim_only:
         sync_gitconfig(home / '.gitconfig', entry.get('unity_yaml_merge'), dry_run)
+        if entry.get('agentic', True):
+            from agentic import sync_agentic
+            sync_agentic(home, os_name, entry, dry_run)
 
 
 def main():
@@ -256,9 +266,14 @@ def main():
         '--only', nargs='+', choices=['linux', 'mac', 'windows'],
         help='only sync homes matching these os values',
     )
-    parser.add_argument(
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument(
         '--vim-only', action='store_true',
         help='sync only vim/nvim config for this run, skipping repo-configs and gitconfig',
+    )
+    mode.add_argument(
+        '--agentic-only', action='store_true',
+        help='sync only Claude Code, Codex, and shell agentic configuration',
     )
     args = parser.parse_args()
 
@@ -271,15 +286,16 @@ def main():
     if args.only:
         homes = [h for h in homes if h.get('os') in args.only]
 
-    print("== nvim local config ==")
-    sync_local_nvim_config(data.get('csharp_lsp', True), args.dry_run)
+    if not args.agentic_only:
+        print("== nvim local config ==")
+        sync_local_nvim_config(data.get('csharp_lsp', True), args.dry_run)
 
     if not homes:
         print("No homes configured (see _config.sample.yml). Nothing to do.")
         return
 
     for entry in homes:
-        sync_home(entry, args.dry_run, args.vim_only)
+        sync_home(entry, args.dry_run, args.vim_only, args.agentic_only)
 
 
 if __name__ == '__main__':

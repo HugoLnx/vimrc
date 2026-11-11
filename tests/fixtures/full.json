@@ -1,0 +1,11 @@
+{
+  "model": {"display_name": "Opus"},
+  "effort": {"level": "medium"},
+  "workspace": {"current_dir": "/tmp/statusline-fixture"},
+  "context_window": {"total_input_tokens": 76400},
+  "rate_limits": {
+    "five_hour": {"used_percentage": 40, "resets_at": 1794405600},
+    "seven_day": {"used_percentage": 60, "resets_at": 1794657600}
+  },
+  "session_name": "session"
+}

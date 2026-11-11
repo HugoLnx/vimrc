@@ -1,0 +1,1 @@
+status_line = ["model-with-reasoning", "context-used", "five-hour-limit", "weekly-limit", "current-dir", "thread-name"]

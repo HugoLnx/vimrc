@@ -24,6 +24,13 @@ if (-not $python) {
 Write-Host '== Symlinking config =='
 & $python.Source (Join-Path $repoDir 'install\symlink.py')
 
+Write-Host '== Windows environment (agentic) =='
+try {
+    & (Join-Path $PSScriptRoot 'windows_env.ps1')
+} catch {
+    Write-Warning "windows_env.ps1 failed: $_"
+}
+
 Write-Host '== vim-plug =='
 New-Item -ItemType Directory -Force -Path "$HOME\vimfiles\autoload" | Out-Null
 Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim' `
