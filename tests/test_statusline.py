@@ -1,9 +1,11 @@
+import importlib.util
 import json
 import os
 import subprocess
 import sys
 import tempfile
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
 
 
@@ -14,13 +16,30 @@ NOW = "1794398400"  # 2026-11-11 12:00 UTC
 E = "\x1b"
 
 
-def run(payload, cwd=None):
+def run(payload, cwd=None, codex_home=None, cache=None):
     env = os.environ.copy()
-    env.update({"STATUSLINE_NOW": NOW, "TZ": "UTC"})
-    result = subprocess.run([sys.executable, str(SCRIPT)], input=json.dumps(payload).encode(),
-                            stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=cwd,
-                            env=env, check=True)
+    with tempfile.TemporaryDirectory(prefix="codex-empty-") as empty:
+        if cache is not None:
+            (Path(empty) / "cache").mkdir()
+            (Path(empty) / "cache" / "codex-usage.json").write_text(json.dumps(cache))
+        env.update({"STATUSLINE_NOW": NOW, "TZ": "UTC", "CODEX_HOME": str(codex_home or empty),
+                    "STATUSLINE_CODEX_REFRESH": "0", "STATUSLINE_CACHE_DIR": str(Path(empty) / "cache")})
+        result = subprocess.run([sys.executable, str(SCRIPT)], input=json.dumps(payload).encode(),
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=cwd,
+                                env=env, check=True)
     return result.stdout.decode()
+
+
+def write_codex(home, line, name="rollout-x.jsonl"):
+    folder = Path(home) / "sessions" / "2026" / "11" / "11"
+    folder.mkdir(parents=True, exist_ok=True)
+    (folder / name).write_text(line + "\n")
+
+
+def codex_line(used, reset, minutes=10080):
+    return json.dumps({"payload": {"rate_limits": {
+        "primary": {"used_percent": 1.0, "window_minutes": 300, "resets_at": 1794416400},
+        "secondary": {"used_percent": used, "window_minutes": minutes, "resets_at": reset}}}})
 
 
 class StatuslineTests(unittest.TestCase):
@@ -80,8 +99,45 @@ class StatuslineTests(unittest.TestCase):
         # Wed 09:00 BRT to Mon 08:00 BRT: 600 + 720 + 720 + 360 + 360 + 60.
         weekday_to_weekend = run({"rate_limits": {"seven_day": {"used_percentage": 60, "resets_at": 1794657600}}})
         weekend_to_weekday = run({"rate_limits": {"seven_day": {"used_percentage": 60, "resets_at": 1794826800}}})
-        self.assertIn(E + "[33m~14Nov", weekday_to_weekend)
-        self.assertIn(E + "[31m~16Nov", weekend_to_weekday)
+        self.assertIn("week:" + E + "[33m60%", weekday_to_weekend)
+        self.assertIn("week:" + E + "[31m60%", weekend_to_weekday)
+        self.assertNotIn("~", weekday_to_weekend)
+
+    def test_codex_cache_beats_session_logs(self):
+        claude = {"rate_limits": {"seven_day": {"used_percentage": 60, "resets_at": 1794657600}}}
+        cache = {"used": 17, "resets_at": 1794657600, "fetched_at": int(NOW)}
+        with tempfile.TemporaryDirectory() as home:
+            write_codex(home, codex_line(94, 1794657600))
+            self.assertIn("cdx" + E + "[36m17%", run(claude, codex_home=home, cache=cache))
+
+    def test_codex_cache_lifetime_and_parsing(self):
+        spec = importlib.util.spec_from_file_location("statusline", SCRIPT)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        now = datetime.fromtimestamp(int(NOW), timezone.utc)
+        self.assertTrue(module.codex_cache_due(None, now))
+        self.assertFalse(module.codex_cache_due({"fetched_at": int(NOW) - 59}, now))
+        self.assertTrue(module.codex_cache_due({"fetched_at": int(NOW) - 60}, now))
+        result = {"rateLimits": {"primary": {"usedPercent": 7, "windowDurationMins": 300, "resetsAt": 1},
+                                 "secondary": {"usedPercent": 17, "windowDurationMins": 10080, "resetsAt": 1796143300}}}
+        self.assertEqual(module.parse_codex_rate_limits(result), {"used": 17.0, "resets_at": 1796143300})
+        self.assertIsNone(module.parse_codex_rate_limits({"rateLimits": {}}))
+
+    def test_codex_week(self):
+        claude = {"rate_limits": {"seven_day": {"used_percentage": 60, "resets_at": 1794657600}}}
+        with tempfile.TemporaryDirectory() as home:
+            write_codex(home, codex_line(60, 1794657600))
+            self.assertIn("week:" + E + "[33m60%" + E + "[0m cdx" + E + "[33m60%", run(claude, codex_home=home))
+        with tempfile.TemporaryDirectory() as home:
+            write_codex(home, codex_line(94, 1794398000))  # stale: window already reset
+            self.assertIn("cdx" + E + "[36m0%", run(claude, codex_home=home))
+        with tempfile.TemporaryDirectory() as home:
+            write_codex(home, codex_line(60, 1794657600))
+            self.assertIn("week:-- cdx" + E + "[33m60%", run({}, codex_home=home))
+        with tempfile.TemporaryDirectory() as home:
+            write_codex(home, "not json \"rate_limits\"")
+            write_codex(home, codex_line(60, 1794657600, minutes=300), name="rollout-y.jsonl")
+            self.assertNotIn("cdx", run(claude, codex_home=home))
 
 
 if __name__ == "__main__":
